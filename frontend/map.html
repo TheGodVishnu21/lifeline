@@ -1,0 +1,1186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>LifeLine — Routing Engine</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #0b0f17;
+    --panel: #121826;
+    --line: #1e2a3e;
+    --ink: #e8edf5;
+    --muted: #8fa0b8;
+    --route: #2dd4bf;      /* computed path */
+    --signal: #ffb020;     /* emergency amber */
+    --danger: #ff5d73;
+    --font-ui: "Space Grotesk", system-ui, sans-serif;
+    --font-data: "IBM Plex Mono", ui-monospace, monospace;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-ui);
+    display: flex;
+    overflow: hidden;
+  }
+
+  /* ---------- sidebar ---------- */
+  #panel {
+    width: 350px;
+    min-width: 350px;
+    height: 100%;
+    overflow-y: auto;
+    background: var(--panel);
+    border-right: 1px solid var(--line);
+    padding: 22px 20px 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .eyebrow {
+    font-family: var(--font-data);
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    color: var(--signal);
+  }
+  h1 { font-size: 22px; font-weight: 700; letter-spacing: -0.01em; }
+  .sub { color: var(--muted); font-size: 13px; line-height: 1.5; }
+
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-family: var(--font-data);
+    font-size: 11px;
+    padding: 4px 10px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    color: var(--muted);
+    width: fit-content;
+  }
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: #556; }
+  .pill.on  .dot { background: #34d399; box-shadow: 0 0 8px #34d39988; }
+  .pill.off .dot { background: var(--danger); }
+
+  label {
+    font-family: var(--font-data);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    color: var(--muted);
+    display: block;
+    margin-bottom: 6px;
+  }
+  select {
+    width: 100%;
+    background: #0e1420;
+    color: var(--ink);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-family: var(--font-ui);
+    font-size: 14px;
+  }
+  select:focus { outline: 2px solid var(--route); outline-offset: 1px; }
+
+  #swap {
+    align-self: center;
+    background: none;
+    border: 1px solid var(--line);
+    color: var(--muted);
+    border-radius: 8px;
+    padding: 4px 12px;
+    cursor: pointer;
+    font-family: var(--font-data);
+    font-size: 12px;
+  }
+  #swap:hover { color: var(--ink); border-color: var(--muted); }
+
+  .seg {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .seg button {
+    background: none;
+    border: none;
+    color: var(--muted);
+    padding: 9px 0;
+    font-family: var(--font-data);
+    font-size: 12px;
+    cursor: pointer;
+  }
+  .seg button.active { background: #1a2436; color: var(--ink); }
+  .seg button:focus-visible { outline: 2px solid var(--route); outline-offset: -2px; }
+
+  #go {
+    width: 100%;
+    background: var(--route);
+    color: #06281f;
+    border: none;
+    border-radius: 8px;
+    padding: 12px;
+    font-family: var(--font-ui);
+    font-weight: 700;
+    font-size: 15px;
+    cursor: pointer;
+  }
+  #go:hover { filter: brightness(1.08); }
+  #go:disabled { opacity: 0.5; cursor: wait; }
+
+  #error {
+    display: none;
+    border: 1px solid var(--danger);
+    background: #ff5d7314;
+    color: var(--danger);
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 13px;
+    line-height: 1.45;
+  }
+
+  /* ---------- results ---------- */
+  #result { display: none; flex-direction: column; gap: 12px; }
+  .stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .stat { background: #0e1420; padding: 12px 14px; }
+  .stat .k {
+    font-family: var(--font-data);
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+  }
+  .stat .v {
+    font-family: var(--font-data);
+    font-size: 20px;
+    margin-top: 4px;
+    color: var(--ink);
+  }
+  .stat .v small { font-size: 12px; color: var(--muted); }
+
+  #pathline {
+    font-family: var(--font-data);
+    font-size: 12px;
+    line-height: 1.7;
+    color: var(--muted);
+    border-left: 2px solid var(--route);
+    padding-left: 10px;
+  }
+  #pathline b { color: var(--ink); font-weight: 500; }
+
+  /* ---------- signature: algorithm race ---------- */
+  #race { display: none; flex-direction: column; gap: 10px; }
+  .race-title {
+    font-family: var(--font-data);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+  }
+  .race-row { display: flex; flex-direction: column; gap: 4px; }
+  .race-label {
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--font-data);
+    font-size: 12px;
+  }
+  .race-label .n { color: var(--ink); }
+  .race-label .c { color: var(--muted); }
+  .bar {
+    height: 10px;
+    border-radius: 5px;
+    background: #0e1420;
+    border: 1px solid var(--line);
+    overflow: hidden;
+  }
+  .bar i {
+    display: block;
+    height: 100%;
+    width: 0%;
+    transition: width 0.7s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  .bar.dijkstra i { background: var(--signal); }
+  .bar.astar    i { background: var(--route); }
+  .race-note { font-size: 12px; color: var(--muted); line-height: 1.5; }
+  .race-note b { color: var(--route); font-weight: 500; }
+
+  /* ---------- disaster panel ---------- */
+  .divider {
+    height: 1px;
+    background: var(--line);
+    margin: 2px 0;
+  }
+  .section-tag {
+    font-family: var(--font-data);
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    color: var(--danger);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .section-tag::before {
+    content: "";
+    width: 6px; height: 6px;
+    background: var(--danger);
+    border-radius: 50%;
+  }
+  #dztrigger {
+    width: 100%;
+    background: none;
+    border: 1px solid var(--danger);
+    color: var(--danger);
+    border-radius: 8px;
+    padding: 11px;
+    font-family: var(--font-ui);
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  #dztrigger:hover { background: #ff5d7314; }
+  #dztrigger.armed { background: var(--danger); color: #2a0710; }
+  .sev {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .sev button {
+    background: none; border: none; color: var(--muted);
+    padding: 8px 0; font-family: var(--font-data); font-size: 12px;
+    cursor: pointer;
+  }
+  .sev button.active { background: #2a1218; color: var(--danger); }
+
+  #evac { display: none; flex-direction: column; gap: 10px; }
+  .flow-big {
+    font-family: var(--font-data);
+    font-size: 26px;
+    color: var(--signal);
+  }
+  .flow-big small { font-size: 12px; color: var(--muted); display: block; margin-top: 2px; }
+  .cut-list { display: flex; flex-direction: column; gap: 4px; }
+  .cut-item {
+    display: flex; justify-content: space-between;
+    font-family: var(--font-data); font-size: 12px;
+    padding: 5px 8px; border-radius: 6px; background: #0e1420;
+    border-left: 2px solid var(--danger);
+  }
+  .cut-item .r { color: var(--ink); }
+  .cut-item .c { color: var(--signal); }
+
+  /* ---------- dispatch + supply + history ---------- */
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .btn-ghost {
+    background: none;
+    border: 1px solid var(--line);
+    color: var(--ink);
+    border-radius: 8px;
+    padding: 10px;
+    font-family: var(--font-ui);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+  }
+  .btn-ghost:hover { border-color: var(--route); color: var(--route); }
+  .btn-ghost:disabled { opacity: 0.45; cursor: not-allowed; }
+
+  #dispatchOut, #supplyOut, #historyOut {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+  }
+  .asg {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 8px;
+    align-items: center;
+    font-family: var(--font-data);
+    font-size: 11px;
+    padding: 6px 8px;
+    border-radius: 6px;
+    background: #0e1420;
+  }
+  .sev-badge {
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 4px;
+    color: #0b0f17;
+  }
+  .sev-5 { background: #ff5d73; }
+  .sev-4 { background: #ff8a4c; }
+  .sev-3 { background: #ffb020; }
+  .sev-2 { background: #58d68d; }
+  .sev-1 { background: #7dd3fc; }
+  .asg .to { color: var(--ink); }
+  .asg .to small { color: var(--muted); display: block; }
+  .asg .km { color: var(--route); text-align: right; }
+  .unassigned {
+    color: var(--danger);
+    font-family: var(--font-data);
+    font-size: 11px;
+    padding: 4px 8px;
+  }
+  .supply-item {
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--font-data);
+    font-size: 11px;
+    padding: 4px 8px;
+    border-radius: 6px;
+    background: #0e1420;
+  }
+  .supply-item .w { color: var(--muted); }
+  .supply-summary {
+    font-family: var(--font-data);
+    font-size: 12px;
+    color: var(--signal);
+    padding: 4px 0;
+  }
+  .hist-row {
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--font-data);
+    font-size: 10px;
+    color: var(--muted);
+    padding: 3px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .hist-row .ev { color: var(--ink); }
+
+  /* ---------- trie search ---------- */
+  #searchWrap { position: relative; }
+  #q {
+    width: 100%;
+    background: #0e1420;
+    color: var(--ink);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-family: var(--font-ui);
+    font-size: 14px;
+  }
+  #q:focus { outline: 2px solid var(--route); outline-offset: 1px; }
+  #suggestions {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0; right: 0;
+    margin-top: 4px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    z-index: 1000;
+    max-height: 230px;
+    overflow-y: auto;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+  }
+  .sugg {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 9px 12px;
+    font-size: 13px;
+    cursor: pointer;
+  }
+  .sugg:hover { background: #1a2436; }
+  .sugg small { color: var(--muted); font-family: var(--font-data); font-size: 10px; }
+
+  /* ---------- resilience + mst ---------- */
+  #resilOut, #mstOut { display: none; flex-direction: column; gap: 5px; }
+  .resil-head {
+    font-family: var(--font-data);
+    font-size: 13px;
+    color: var(--ink);
+    padding: 4px 0;
+  }
+  .crit-item {
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--font-data);
+    font-size: 11px;
+    padding: 5px 8px;
+    border-radius: 6px;
+    background: #0e1420;
+    border-left: 2px solid #b78bff;
+  }
+  .crit-item .c { color: #b78bff; }
+  .chips { display: flex; flex-wrap: wrap; gap: 5px; }
+  .chip {
+    font-family: var(--font-data);
+    font-size: 10px;
+    padding: 3px 8px;
+    border-radius: 999px;
+    border: 1px solid #b78bff66;
+    color: #b78bff;
+  }
+  .ok-line { color: #58d68d; font-size: 12px; font-family: var(--font-data); }
+  .warn-line { color: var(--danger); font-size: 12px; font-family: var(--font-data); }
+
+  /* ---------- legend ---------- */
+  #legend {
+    margin-top: auto;
+    border-top: 1px solid var(--line);
+    padding-top: 14px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px 14px;
+  }
+  .lg { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--muted); }
+  .lg i { width: 9px; height: 9px; border-radius: 50%; }
+
+  /* ---------- map ---------- */
+  #map { flex: 1; height: 100%; background: #0b0f17; }
+  .leaflet-container { background: #0b0f17; font-family: var(--font-ui); }
+  .leaflet-tooltip {
+    background: #121826;
+    color: var(--ink);
+    border: 1px solid var(--line);
+    font-family: var(--font-data);
+    font-size: 11px;
+  }
+  .leaflet-tooltip-top:before { border-top-color: var(--line); }
+
+  @keyframes dash { to { stroke-dashoffset: -22; } }
+  .route-anim { animation: dash 1.2s linear infinite; }
+  @media (prefers-reduced-motion: reduce) {
+    .route-anim { animation: none; }
+    .bar i { transition: none; }
+  }
+
+  @media (max-width: 760px) {
+    body { flex-direction: column; }
+    #panel { width: 100%; min-width: 0; height: 55%; order: 2; border-right: none; border-top: 1px solid var(--line); }
+    #map { height: 45%; order: 1; }
+  }
+</style>
+</head>
+<body>
+
+<aside id="panel">
+  <div>
+    <div class="eyebrow">LIFELINE // PHASE 1</div>
+    <h1>Routing Engine</h1>
+    <p class="sub">Emergency dispatch over the Indrapur road graph — Dijkstra and A* on a custom min-heap.</p>
+  </div>
+
+  <span class="pill" id="status"><span class="dot"></span><span id="statusText">connecting…</span></span>
+
+  <div id="error"></div>
+
+  <div id="searchWrap">
+    <label for="q">FIND LOCATION — TRIE PREFIX SEARCH</label>
+    <input id="q" placeholder="Type a prefix… e.g. riv" autocomplete="off" />
+    <div id="suggestions"></div>
+  </div>
+
+  <div>
+    <label for="from">FROM</label>
+    <select id="from"></select>
+  </div>
+  <button id="swap" title="Swap from and to">⇅ swap</button>
+  <div>
+    <label for="to">TO</label>
+    <select id="to"></select>
+  </div>
+
+  <div>
+    <label>ALGORITHM</label>
+    <div class="seg" id="algoSeg">
+      <button data-algo="dijkstra" class="active">Dijkstra</button>
+      <button data-algo="astar">A*</button>
+      <button data-algo="compare">Compare</button>
+    </div>
+  </div>
+
+  <button id="go">Find route</button>
+
+  <section id="result">
+    <div class="stats">
+      <div class="stat"><div class="k">DISTANCE</div><div class="v" id="rDist">–</div></div>
+      <div class="stat"><div class="k">ETA @30 KM/H</div><div class="v" id="rEta">–</div></div>
+      <div class="stat"><div class="k">NODES EXPLORED</div><div class="v" id="rExp">–</div></div>
+      <div class="stat"><div class="k">RUNTIME</div><div class="v" id="rTime">–</div></div>
+    </div>
+    <div id="pathline"></div>
+  </section>
+
+  <section id="race">
+    <div class="race-title">SEARCH EFFORT — SAME OPTIMAL PATH</div>
+    <div class="race-row">
+      <div class="race-label"><span class="n">Dijkstra</span><span class="c" id="cDij">–</span></div>
+      <div class="bar dijkstra"><i id="bDij"></i></div>
+    </div>
+    <div class="race-row">
+      <div class="race-label"><span class="n">A* (haversine h)</span><span class="c" id="cAst">–</span></div>
+      <div class="bar astar"><i id="bAst"></i></div>
+    </div>
+    <p class="race-note" id="raceNote"></p>
+  </section>
+
+  <div class="divider"></div>
+  <div class="section-tag">DISASTER SIMULATION</div>
+  <p class="sub">Pick a spread radius, then click a map location (or use the box below) to flood it. Roads inside the zone close; routing reroutes live.</p>
+  <div>
+    <label>SPREAD RADIUS</label>
+    <div class="sev" id="sevSeg">
+      <button data-sev="1" class="active">1 ring</button>
+      <button data-sev="2">2 rings</button>
+      <button data-sev="3">3 rings</button>
+    </div>
+  </div>
+  <div>
+    <label for="epi">EPICENTER</label>
+    <select id="epi"></select>
+  </div>
+  <button id="dztrigger">⚠ Trigger disaster</button>
+
+  <section id="evac">
+    <div class="section-tag" style="color:var(--signal)">EVACUATION CAPACITY</div>
+    <div class="flow-big" id="flowVal">–<small>people/hour to safe shelters</small></div>
+    <div class="race-title" id="cutTitle">MIN-CUT BOTTLENECKS</div>
+    <div class="cut-list" id="cutList"></div>
+    <p class="race-note" id="evacNote"></p>
+  </section>
+
+  <div class="divider"></div>
+  <div class="section-tag" style="color:var(--route)">RESPONSE COORDINATION</div>
+  <p class="sub">Dispatch responders to the disaster zone (triage + greedy nearest vehicle), or pack a relief truck (knapsack).</p>
+  <div class="row2">
+    <button class="btn-ghost" id="btnDispatch">🚑 Dispatch units</button>
+    <button class="btn-ghost" id="btnSupply">📦 Load truck</button>
+  </div>
+
+  <section id="dispatchOut"></section>
+  <section id="supplyOut"></section>
+
+  <div class="divider"></div>
+  <div class="section-tag" style="color:#b78bff">NETWORK RESILIENCE</div>
+  <p class="sub">Tarjan's DFS finds critical roads (bridges) and junctions (articulation points) in the current network. MST = minimum backbone to keep the city connected.</p>
+  <div class="row2">
+    <button class="btn-ghost" id="btnResil">🕸 Analyze network</button>
+    <button class="btn-ghost" id="btnMst">🌿 Restoration plan</button>
+  </div>
+
+  <section id="resilOut"></section>
+  <section id="mstOut"></section>
+
+  <div class="divider"></div>
+  <div style="display:flex;justify-content:space-between;align-items:center">
+    <div class="section-tag" style="color:var(--muted)">ACTIVITY LOG</div>
+    <button class="btn-ghost" id="btnHistory" style="padding:5px 10px;font-size:11px">refresh</button>
+  </div>
+  <section id="historyOut"></section>
+
+  <div id="legend"></div>
+</aside>
+
+<div id="map"></div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+"use strict";
+
+// Served from the backend -> same origin. Opened as file:// -> localhost.
+const API = location.protocol === "file:" ? "http://localhost:8080" : "";
+
+const TYPE_COLORS = {
+  hospital: "#ff5d73",
+  fire_station: "#ffa02e",
+  police: "#4ea8ff",
+  shelter: "#58d68d",
+  transit: "#c39bff",
+  infrastructure: "#9d7bff",
+  bridge: "#ffd166",
+  market: "#f2a1c0",
+  office: "#7dd3fc",
+  education: "#7dd3fc",
+  residential: "#8fa0b8",
+  industrial: "#b8a58f",
+  junction: "#5d6b82",
+};
+const LEGEND_ORDER = [
+  ["hospital", "Hospital"], ["fire_station", "Fire station"],
+  ["police", "Police"], ["shelter", "Shelter"],
+  ["bridge", "River bridge"], ["residential", "Residential"],
+];
+
+const $ = (id) => document.getElementById(id);
+let map, routeLayer, disasterLayer, dispatchLayer, resilLayer, mstLayer, city = null;
+let algo = "dijkstra", severity = 1, disasterOn = false;
+let nodeById = {}, nodeMarkers = {};
+
+function setStatus(on, text) {
+  $("status").className = "pill " + (on ? "on" : "off");
+  $("statusText").textContent = text;
+}
+function showError(msg) {
+  const e = $("error");
+  e.style.display = msg ? "block" : "none";
+  e.textContent = msg || "";
+}
+
+async function apiGet(path) {
+  const ctrl = new AbortController();
+  const t = setTimeout(() => ctrl.abort(), 4000);
+  try {
+    const r = await fetch(API + path, { signal: ctrl.signal });
+    if (!r.ok) {
+      const body = await r.json().catch(() => ({}));
+      throw new Error(body.error || ("HTTP " + r.status));
+    }
+    return await r.json();
+  } finally {
+    clearTimeout(t);
+  }
+}
+
+function initMap() {
+  map = L.map("map", { zoomControl: true }).setView([19.075, 72.882], 13);
+  L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/">CARTO</a>',
+    maxZoom: 19,
+  }).addTo(map);
+  disasterLayer = L.layerGroup().addTo(map);  // under everything
+  mstLayer = L.layerGroup().addTo(map);       // green backbone
+  resilLayer = L.layerGroup().addTo(map);     // violet critical roads
+  dispatchLayer = L.layerGroup().addTo(map);  // vehicle routes
+  routeLayer = L.layerGroup().addTo(map);     // on top
+}
+
+let edgeLines = {};  // "u-v" -> polyline, so we can recolour blocked roads
+
+function edgeKey(u, v) { return Math.min(u, v) + "-" + Math.max(u, v); }
+
+function drawCity() {
+  city.nodes.forEach((n) => (nodeById[n.id] = n));
+
+  city.edges.forEach((e) => {
+    const a = nodeById[e.from], b = nodeById[e.to];
+    const line = L.polyline([[a.lat, a.lon], [b.lat, b.lon]], {
+      color: "#223048", weight: 1.6, opacity: 0.85,
+    }).bindTooltip(`${e.road} · ${e.length_km} km`, { sticky: true })
+      .addTo(map);
+    edgeLines[edgeKey(e.from, e.to)] = line;
+  });
+
+  city.nodes.forEach((n) => {
+    const c = TYPE_COLORS[n.type] || "#8fa0b8";
+    const m = L.circleMarker([n.lat, n.lon], {
+      radius: ["hospital", "fire_station", "shelter"].includes(n.type) ? 7 : 5,
+      color: c, weight: 1.5, fillColor: c, fillOpacity: 0.55,
+    }).bindTooltip(`[${n.id}] ${n.name}`).addTo(map);
+    m.on("click", () => triggerDisaster(n.id));  // click a node to flood it
+    nodeMarkers[n.id] = m;
+  });
+
+  map.fitBounds(city.nodes.map((n) => [n.lat, n.lon]), { padding: [30, 30] });
+}
+
+// Repaint every road: red + dashed if blocked, default otherwise.
+function paintBlocked(blockedKeys) {
+  const set = new Set(blockedKeys);
+  for (const [key, line] of Object.entries(edgeLines)) {
+    if (set.has(key)) {
+      line.setStyle({ color: "#ff5d73", weight: 2.2, opacity: 0.9, dashArray: "4 5" });
+    } else {
+      line.setStyle({ color: "#223048", weight: 1.6, opacity: 0.85, dashArray: null });
+    }
+  }
+}
+
+function fillSelects() {
+  const opts = [...city.nodes].sort((a, b) => a.name.localeCompare(b.name));
+  for (const sel of [$("from"), $("to")]) {
+    sel.innerHTML = "";
+    opts.forEach((n) => {
+      const o = document.createElement("option");
+      o.value = n.id;
+      o.textContent = n.name;
+      sel.appendChild(o);
+    });
+  }
+  $("from").value = 15; // Riverside Colony
+  $("to").value = 1;    // Sunrise Hospital — one-click demo
+
+  const epi = $("epi");
+  epi.innerHTML = "";
+  opts.forEach((n) => {
+    const o = document.createElement("option");
+    o.value = n.id;
+    o.textContent = n.name;
+    epi.appendChild(o);
+  });
+  epi.value = 26;       // River Bridge South — best disaster demo
+}
+
+function buildLegend() {
+  $("legend").innerHTML = LEGEND_ORDER.map(
+    ([k, label]) =>
+      `<span class="lg"><i style="background:${TYPE_COLORS[k]}"></i>${label}</span>`
+  ).join("");
+}
+
+function drawRoute(coords) {
+  routeLayer.clearLayers();
+  L.polyline(coords, {
+    color: "#2dd4bf", weight: 4.5, opacity: 0.95,
+    dashArray: "10 12", className: "route-anim",
+  }).addTo(routeLayer);
+  map.fitBounds(coords, { padding: [60, 60] });
+}
+
+function fmtUs(us) {
+  return us >= 1000 ? (us / 1000).toFixed(2) + " ms" : Math.round(us) + " µs";
+}
+
+function showSingle(r) {
+  $("result").style.display = "flex";
+  $("race").style.display = "none";
+  $("rDist").innerHTML = r.distance_km.toFixed(2) + " <small>km</small>";
+  $("rEta").innerHTML = Math.round(r.eta_min) + " <small>min</small>";
+  $("rExp").textContent = r.nodes_explored;
+  $("rTime").textContent = fmtUs(r.runtime_us);
+  $("pathline").innerHTML =
+    r.path_names.map((n) => `<b>${n}</b>`).join(" → ");
+  drawRoute(r.coords);
+}
+
+function showCompare(d, a) {
+  showSingle(a); // draw A* result (identical optimal distance)
+  $("rExp").textContent = `${a.nodes_explored} vs ${d.nodes_explored}`;
+  $("race").style.display = "flex";
+  const max = Math.max(d.nodes_explored, a.nodes_explored, 1);
+  $("cDij").textContent = d.nodes_explored + " nodes · " + fmtUs(d.runtime_us);
+  $("cAst").textContent = a.nodes_explored + " nodes · " + fmtUs(a.runtime_us);
+  requestAnimationFrame(() => {
+    $("bDij").style.width = (d.nodes_explored / max) * 100 + "%";
+    $("bAst").style.width = (a.nodes_explored / max) * 100 + "%";
+  });
+  const saved = d.nodes_explored - a.nodes_explored;
+  $("raceNote").innerHTML =
+    saved > 0
+      ? `Same ${a.distance_km.toFixed(2)} km path — the haversine heuristic let A* skip <b>${saved} nodes</b> that Dijkstra had to settle.`
+      : `Both settled the same nodes here — try a longer route to see A* pull ahead.`;
+}
+
+async function findRoute() {
+  const from = $("from").value, to = $("to").value;
+  showError("");
+  $("go").disabled = true;
+  try {
+    if (algo === "compare") {
+      const [d, a] = await Promise.all([
+        apiGet(`/api/route?from=${from}&to=${to}&algo=dijkstra`),
+        apiGet(`/api/route?from=${from}&to=${to}&algo=astar`),
+      ]);
+      if (!d.found) throw new Error("No route found between these points.");
+      showCompare(d, a);
+    } else {
+      const r = await apiGet(`/api/route?from=${from}&to=${to}&algo=${algo}`);
+      if (!r.found) throw new Error("No route found between these points.");
+      showSingle(r);
+    }
+  } catch (err) {
+    showError(routeErrText(err));
+  } finally {
+    $("go").disabled = false;
+  }
+}
+
+function routeErrText(err) {
+  if (err.name === "AbortError" || err.message.includes("fetch"))
+    return "Backend offline — start it with ./lifeline inside backend/ and reload.";
+  return err.message;
+}
+
+// ---------- disaster simulation ----------
+const WAVE_COLORS = ["#ff5d73", "#ff8a4c", "#ffb020"];  // ring 0,1,2+
+
+function renderDisaster(d) {
+  disasterLayer.clearLayers();
+  resilLayer.clearLayers();          // road state changed -> stale
+  $("resilOut").style.display = "none";
+  disasterOn = true;
+
+  // concentric wave rings as translucent circles
+  d.waves.forEach((wave, ring) => {
+    const color = WAVE_COLORS[Math.min(ring, WAVE_COLORS.length - 1)];
+    wave.forEach((id) => {
+      const n = nodeById[id];
+      L.circleMarker([n.lat, n.lon], {
+        radius: 13 - ring * 2,
+        color, weight: 1.5, fillColor: color,
+        fillOpacity: ring === 0 ? 0.5 : 0.28,
+      }).addTo(disasterLayer);
+    });
+  });
+
+  // pulsing epicenter marker
+  const e = nodeById[d.epicenter];
+  L.circleMarker([e.lat, e.lon], {
+    radius: 9, color: "#fff", weight: 2,
+    fillColor: "#ff5d73", fillOpacity: 0.9,
+  }).bindTooltip(`Epicenter: ${d.epicenter_name}`, { permanent: false })
+    .addTo(disasterLayer);
+
+  paintBlocked(d.blocked_edges.map((b) => edgeKey(b.from, b.to)));
+
+  $("dztrigger").classList.add("armed");
+  $("dztrigger").textContent = `✕ Clear ${d.type} (${d.blocked_count} roads down)`;
+
+  // recompute the currently displayed route against the new road state
+  if ($("result").style.display === "flex") findRoute();
+}
+
+async function triggerDisaster(epicenterId) {
+  if (epicenterId != null) $("epi").value = epicenterId;
+  const epicenter = parseInt($("epi").value, 10);
+  showError("");
+  try {
+    const d = await postJson("/api/disaster", {
+      epicenter, type: "flood", severity,
+    });
+    renderDisaster(d);
+    await loadEvacuation();
+  } catch (err) {
+    showError(routeErrText(err));
+  }
+}
+
+async function loadEvacuation() {
+  try {
+    const e = await apiGet("/api/evacuation");
+    $("evac").style.display = "flex";
+    $("flowVal").innerHTML =
+      Math.round(e.max_flow_per_hour).toLocaleString() +
+      "<small>people/hour to safe shelters</small>";
+
+    if (!e.bottlenecks.length) {
+      $("cutTitle").style.display = "none";
+      $("cutList").innerHTML = "";
+    } else {
+      $("cutTitle").style.display = "block";
+      $("cutList").innerHTML = e.bottlenecks
+        .sort((a, b) => a.capacity - b.capacity)
+        .map((b) => `<div class="cut-item"><span class="r">${b.road}</span>` +
+                    `<span class="c">${Math.round(b.capacity).toLocaleString()}/hr</span></div>`)
+        .join("");
+    }
+    $("evacNote").innerHTML = e.note
+      ? `⚠ ${e.note}`
+      : `Ford–Fulkerson found this in <b>${e.augmenting_paths}</b> augmenting paths. ` +
+        `The min-cut roads above are the true evacuation bottleneck — widening any other road won't help.`;
+  } catch (err) {
+    $("evac").style.display = "none";
+  }
+}
+
+async function clearDisaster() {
+  await postJson("/api/reset", {});
+  disasterLayer.clearLayers();
+  dispatchLayer.clearLayers();
+  resilLayer.clearLayers();
+  disasterOn = false;
+  paintBlocked([]);
+  $("evac").style.display = "none";
+  $("dispatchOut").style.display = "none";
+  $("resilOut").style.display = "none";
+  $("dztrigger").classList.remove("armed");
+  $("dztrigger").textContent = "⚠ Trigger disaster";
+  if ($("result").style.display === "flex") findRoute();
+}
+
+async function postJson(path, body) {
+  const ctrl = new AbortController();
+  const t = setTimeout(() => ctrl.abort(), 4000);
+  try {
+    const r = await fetch(API + path, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+      signal: ctrl.signal,
+    });
+    if (!r.ok) {
+      const b = await r.json().catch(() => ({}));
+      throw new Error(b.error || ("HTTP " + r.status));
+    }
+    return await r.json();
+  } finally {
+    clearTimeout(t);
+  }
+}
+
+// ---------- dispatch / supply / history ----------
+function sevBadge(s) { return `<span class="sev-badge sev-${s}">${s}</span>`; }
+
+async function runDispatch() {
+  $("btnDispatch").disabled = true;
+  showError("");
+  try {
+    // empty body => backend uses default fleet + active disaster zone
+    const d = await postJson("/api/dispatch", {});
+    dispatchLayer.clearLayers();
+
+    // draw each vehicle->incident route in amber
+    d.assignments.forEach((a) => {
+      if (a.coords && a.coords.length > 1) {
+        L.polyline(a.coords, {
+          color: "#ffb020", weight: 3, opacity: 0.8, dashArray: "6 6",
+        }).addTo(dispatchLayer);
+      }
+      // mark the incident
+      const inc = nodeById[a.incident_node];
+      L.circleMarker([inc.lat, inc.lon], {
+        radius: 6, color: "#ffb020", weight: 2,
+        fillColor: "#ff5d73", fillOpacity: 0.8,
+      }).addTo(dispatchLayer);
+    });
+
+    const out = $("dispatchOut");
+    out.style.display = "flex";
+    let html = d.assignments.map((a) =>
+      `<div class="asg">${sevBadge(a.severity)}` +
+      `<span class="to">${a.incident_name}<small>${a.vehicle_type} #${a.vehicle_id} from ${a.vehicle_name}</small></span>` +
+      `<span class="km">${a.distance_km.toFixed(1)} km<br>${Math.round(a.eta_min)} min</span></div>`
+    ).join("");
+    if (d.unassigned.length)
+      html += `<div class="unassigned">⚠ ${d.unassigned.length} incident(s) unreachable — roads cut off</div>`;
+    const fleet = d.assignments_by_type
+      ? Object.entries(d.assignments_by_type)
+          .map(([k, v]) => `${v} ${k.replace("_", " ")}`).join(" · ")
+      : "";
+    html += `<div class="supply-summary">${d.assignments.length} units dispatched` +
+            `${fleet ? " (" + fleet + ")" : ""} · ${d.total_response_km.toFixed(1)} km total</div>`;
+    out.innerHTML = html;
+    loadHistory();
+  } catch (err) {
+    showError(err.message.includes("disaster")
+      ? "Trigger a disaster first, then dispatch responders to the zone."
+      : routeErrText(err));
+  } finally {
+    $("btnDispatch").disabled = false;
+  }
+}
+
+async function runSupply() {
+  $("btnSupply").disabled = true;
+  try {
+    const s = await postJson("/api/supply", { capacity: 50 });
+    const out = $("supplyOut");
+    out.style.display = "flex";
+    out.innerHTML =
+      `<div class="supply-summary">50 kg truck → packed ${s.total_weight} kg, relief value ${s.total_value}</div>` +
+      s.chosen.map((it) =>
+        `<div class="supply-item"><span>${it.name}</span>` +
+        `<span class="w">${it.weight} kg · v${it.value}</span></div>`
+      ).join("");
+  } catch (err) {
+    showError(routeErrText(err));
+  } finally {
+    $("btnSupply").disabled = false;
+  }
+}
+
+async function loadHistory() {
+  try {
+    const h = await apiGet("/api/history?limit=8");
+    const out = $("historyOut");
+    if (!h.entries.length) { out.style.display = "none"; return; }
+    out.style.display = "flex";
+    out.innerHTML = h.entries.map((e) => {
+      const time = e.timestamp.split(" ")[1] || e.timestamp;
+      return `<div class="hist-row"><span class="ev">${e.event}</span>` +
+             `<span>${e.detail}</span><span>${time}</span></div>`;
+    }).join("");
+  } catch (err) {
+    $("historyOut").style.display = "none";
+  }
+}
+
+// ---------- trie search ----------
+function hideSuggestions() { $("suggestions").style.display = "none"; }
+
+async function onSearchInput() {
+  const q = $("q").value.trim();
+  if (!q) return hideSuggestions();
+  try {
+    const s = await apiGet("/api/suggest?q=" + encodeURIComponent(q));
+    const box = $("suggestions");
+    if (!s.results.length) {
+      box.innerHTML = `<div class="sugg"><span style="color:var(--muted)">no matches (prefix search)</span></div>`;
+    } else {
+      box.innerHTML = s.results.map((r) =>
+        `<div class="sugg" data-id="${r.id}" data-lat="${r.lat}" data-lon="${r.lon}">` +
+        `<span>${r.name}</span><small>${r.type.replace("_", " ")}</small></div>`
+      ).join("");
+    }
+    box.style.display = "block";
+  } catch (e) { hideSuggestions(); }
+}
+
+function onSuggestionClick(ev) {
+  const el = ev.target.closest(".sugg");
+  if (!el || !el.dataset.id) return;
+  const id = parseInt(el.dataset.id, 10);
+  map.setView([parseFloat(el.dataset.lat), parseFloat(el.dataset.lon)], 15);
+  if (nodeMarkers[id]) nodeMarkers[id].openTooltip();
+  $("q").value = nodeById[id].name;
+  hideSuggestions();
+}
+
+// ---------- resilience (Tarjan) ----------
+async function runResilience() {
+  $("btnResil").disabled = true;
+  try {
+    const r = await apiGet("/api/resilience");
+    resilLayer.clearLayers();
+
+    r.bridges.forEach((b) => {
+      L.polyline(b.coords, {
+        color: "#b78bff", weight: 5, opacity: 0.9,
+      }).bindTooltip(`CRITICAL: ${b.road} — losing this splits the network`,
+                     { sticky: true }).addTo(resilLayer);
+    });
+    r.articulation_points.forEach((a) => {
+      L.circleMarker([a.lat, a.lon], {
+        radius: 11, color: "#b78bff", weight: 2.5,
+        fillOpacity: 0, dashArray: "3 3",
+      }).bindTooltip(`CRITICAL JUNCTION: ${a.name}`).addTo(resilLayer);
+    });
+
+    const out = $("resilOut");
+    out.style.display = "flex";
+    let html = `<div class="resil-head">${r.components} connected component${r.components > 1 ? "s" : ""}</div>`;
+    if (r.isolated.length)
+      html += `<div class="warn-line">⚠ isolated: ${r.isolated.map(i => i.name).join(", ")}</div>`;
+    if (r.cut_off_from_hospital.length)
+      html += `<div class="warn-line">⚠ no hospital reachable: ${r.cut_off_from_hospital.map(i => i.name).join(", ")}</div>`;
+    if (!r.bridges.length && !r.articulation_points.length) {
+      html += `<div class="ok-line">✓ No single road or junction failure can split this network — healthy mesh (every node has degree ≥ 3).</div>`;
+    } else {
+      html += r.bridges.map((b) =>
+        `<div class="crit-item"><span>${b.road}</span><span class="c">bridge</span></div>`).join("");
+      if (r.articulation_points.length)
+        html += `<div class="chips">` + r.articulation_points.map((a) =>
+          `<span class="chip">${a.name}</span>`).join("") + `</div>`;
+      html += `<p class="race-note">Violet = single points of failure found by one Tarjan DFS (O(V+E)). ${disasterOn ? "The disaster created these — the healthy mesh has none." : ""}</p>`;
+    }
+    out.innerHTML = html;
+  } catch (err) {
+    showError(routeErrText(err));
+  } finally {
+    $("btnResil").disabled = false;
+  }
+}
+
+// ---------- MST restoration plan ----------
+async function runMst() {
+  $("btnMst").disabled = true;
+  try {
+    const m = await apiGet("/api/mst");
+    mstLayer.clearLayers();
+    m.kruskal.edges.forEach((e) => {
+      L.polyline(e.coords, {
+        color: "#58d68d", weight: 3.5, opacity: 0.75,
+      }).bindTooltip(`MST: ${e.road} · ${e.length_km} km`, { sticky: true })
+        .addTo(mstLayer);
+    });
+    const out = $("mstOut");
+    out.style.display = "flex";
+    out.innerHTML =
+      `<div class="resil-head">${m.kruskal.total_km.toFixed(2)} km minimum backbone (${m.kruskal.edge_count} roads)</div>` +
+      `<div class="ok-line">✓ Prim ${m.prim.total_km.toFixed(2)} km = Kruskal ${m.kruskal.total_km.toFixed(2)} km — two algorithms, one optimum</div>` +
+      `<p class="race-note">Green = the cheapest set of roads that keeps every zone connected (planning view, ignores blockages). Prim ${Math.round(m.prim.runtime_us)}µs vs Kruskal ${Math.round(m.kruskal.runtime_us)}µs.</p>`;
+  } catch (err) {
+    showError(routeErrText(err));
+  } finally {
+    $("btnMst").disabled = false;
+  }
+}
+
+async function boot() {
+  initMap();
+  buildLegend();
+  try {
+    const h = await apiGet("/api/health");
+    setStatus(true, `${h.city} · ${h.nodes} nodes · ${h.edges} roads`);
+    city = await apiGet("/api/city");
+    drawCity();
+    fillSelects();
+    loadHistory();
+
+    // page reload during an active disaster? restore the full picture
+    try {
+      const ds = await apiGet("/api/disaster");
+      if (ds.active) {
+        severity = ds.severity;
+        document.querySelectorAll("#sevSeg button").forEach((x) =>
+          x.classList.toggle("active",
+            parseInt(x.dataset.sev, 10) === severity));
+        $("epi").value = ds.epicenter;
+        renderDisaster(ds);
+        await loadEvacuation();
+      }
+    } catch (e) { /* no disaster state — fine */ }
+  } catch (err) {
+    setStatus(false, "backend offline");
+    showError("Could not reach the LifeLine backend. Run ./lifeline inside backend/, then reload this page.");
+  }
+}
+
+$("algoSeg").addEventListener("click", (ev) => {
+  const b = ev.target.closest("button");
+  if (!b) return;
+  algo = b.dataset.algo;
+  document.querySelectorAll("#algoSeg button").forEach((x) =>
+    x.classList.toggle("active", x === b));
+});
+$("go").addEventListener("click", findRoute);
+$("swap").addEventListener("click", () => {
+  const f = $("from").value;
+  $("from").value = $("to").value;
+  $("to").value = f;
+});
+
+$("sevSeg").addEventListener("click", (ev) => {
+  const b = ev.target.closest("button");
+  if (!b) return;
+  severity = parseInt(b.dataset.sev, 10);
+  document.querySelectorAll("#sevSeg button").forEach((x) =>
+    x.classList.toggle("active", x === b));
+  if (disasterOn) triggerDisaster();  // live re-run at new radius
+});
+
+$("dztrigger").addEventListener("click", () => {
+  if (disasterOn) clearDisaster();
+  else triggerDisaster();
+});
+
+$("btnDispatch").addEventListener("click", runDispatch);
+$("btnSupply").addEventListener("click", runSupply);
+$("btnHistory").addEventListener("click", loadHistory);
+$("btnResil").addEventListener("click", runResilience);
+$("btnMst").addEventListener("click", runMst);
+$("q").addEventListener("input", onSearchInput);
+$("q").addEventListener("blur", () => setTimeout(hideSuggestions, 180));
+$("suggestions").addEventListener("mousedown", onSuggestionClick);
+
+boot();
+</script>
+</body>
+</html>

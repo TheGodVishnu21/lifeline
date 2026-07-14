@@ -1,0 +1,539 @@
+{
+  "city": "Indrapur",
+  "nodes": [
+    {
+      "id": 0,
+      "name": "City Hospital",
+      "type": "hospital",
+      "lat": 19.088,
+      "lon": 72.858
+    },
+    {
+      "id": 1,
+      "name": "Sunrise Hospital",
+      "type": "hospital",
+      "lat": 19.089,
+      "lon": 72.894
+    },
+    {
+      "id": 2,
+      "name": "Green Valley Hospital",
+      "type": "hospital",
+      "lat": 19.058,
+      "lon": 72.892
+    },
+    {
+      "id": 3,
+      "name": "Central Fire Station",
+      "type": "fire_station",
+      "lat": 19.079,
+      "lon": 72.868
+    },
+    {
+      "id": 4,
+      "name": "North Fire Station",
+      "type": "fire_station",
+      "lat": 19.096,
+      "lon": 72.89
+    },
+    {
+      "id": 5,
+      "name": "Police HQ",
+      "type": "police",
+      "lat": 19.073,
+      "lon": 72.864
+    },
+    {
+      "id": 6,
+      "name": "East Police Post",
+      "type": "police",
+      "lat": 19.072,
+      "lon": 72.897
+    },
+    {
+      "id": 7,
+      "name": "Indrapur Railway Stn",
+      "type": "transit",
+      "lat": 19.076,
+      "lon": 72.856
+    },
+    {
+      "id": 8,
+      "name": "Bus Terminal",
+      "type": "transit",
+      "lat": 19.07,
+      "lon": 72.884
+    },
+    {
+      "id": 9,
+      "name": "Community Shelter A",
+      "type": "shelter",
+      "lat": 19.093,
+      "lon": 72.866
+    },
+    {
+      "id": 10,
+      "name": "Community Shelter B",
+      "type": "shelter",
+      "lat": 19.083,
+      "lon": 72.899
+    },
+    {
+      "id": 11,
+      "name": "Stadium Shelter",
+      "type": "shelter",
+      "lat": 19.064,
+      "lon": 72.884
+    },
+    {
+      "id": 12,
+      "name": "Old Market",
+      "type": "market",
+      "lat": 19.081,
+      "lon": 72.862
+    },
+    {
+      "id": 13,
+      "name": "Tech Park",
+      "type": "office",
+      "lat": 19.09,
+      "lon": 72.905
+    },
+    {
+      "id": 14,
+      "name": "Indrapur University",
+      "type": "education",
+      "lat": 19.079,
+      "lon": 72.906
+    },
+    {
+      "id": 15,
+      "name": "Riverside Colony",
+      "type": "residential",
+      "lat": 19.068,
+      "lon": 72.871
+    },
+    {
+      "id": 16,
+      "name": "Hill View Colony",
+      "type": "residential",
+      "lat": 19.097,
+      "lon": 72.9
+    },
+    {
+      "id": 17,
+      "name": "Lake Town",
+      "type": "residential",
+      "lat": 19.063,
+      "lon": 72.903
+    },
+    {
+      "id": 18,
+      "name": "Green Park",
+      "type": "residential",
+      "lat": 19.087,
+      "lon": 72.871
+    },
+    {
+      "id": 19,
+      "name": "Industrial Area",
+      "type": "industrial",
+      "lat": 19.052,
+      "lon": 72.898
+    },
+    {
+      "id": 20,
+      "name": "Power Plant",
+      "type": "infrastructure",
+      "lat": 19.048,
+      "lon": 72.888
+    },
+    {
+      "id": 21,
+      "name": "Water Works",
+      "type": "infrastructure",
+      "lat": 19.055,
+      "lon": 72.879
+    },
+    {
+      "id": 22,
+      "name": "City Mall",
+      "type": "market",
+      "lat": 19.062,
+      "lon": 72.86
+    },
+    {
+      "id": 23,
+      "name": "Airport Rd Junction",
+      "type": "junction",
+      "lat": 19.086,
+      "lon": 72.884
+    },
+    {
+      "id": 24,
+      "name": "Ring Road North",
+      "type": "junction",
+      "lat": 19.098,
+      "lon": 72.872
+    },
+    {
+      "id": 25,
+      "name": "Ring Road South",
+      "type": "junction",
+      "lat": 19.056,
+      "lon": 72.868
+    },
+    {
+      "id": 26,
+      "name": "River Bridge South",
+      "type": "bridge",
+      "lat": 19.066,
+      "lon": 72.877
+    },
+    {
+      "id": 27,
+      "name": "River Bridge North",
+      "type": "bridge",
+      "lat": 19.09,
+      "lon": 72.877
+    }
+  ],
+  "edges": [
+    {
+      "from": 7,
+      "to": 12,
+      "length_km": 0.967,
+      "road": "Station Road",
+      "capacity": 4000
+    },
+    {
+      "from": 7,
+      "to": 22,
+      "length_km": 1.935,
+      "road": "Mall Road",
+      "capacity": 3500
+    },
+    {
+      "from": 7,
+      "to": 5,
+      "length_km": 0.995,
+      "road": "MG Road",
+      "capacity": 4000
+    },
+    {
+      "from": 12,
+      "to": 0,
+      "length_km": 0.973,
+      "road": "Hospital Road",
+      "capacity": 3000
+    },
+    {
+      "from": 12,
+      "to": 3,
+      "length_km": 0.735,
+      "road": "Market Street",
+      "capacity": 3000
+    },
+    {
+      "from": 12,
+      "to": 5,
+      "length_km": 1.051,
+      "road": "Old Town Road",
+      "capacity": 2500
+    },
+    {
+      "from": 0,
+      "to": 9,
+      "length_km": 1.109,
+      "road": "Care Avenue",
+      "capacity": 2500
+    },
+    {
+      "from": 0,
+      "to": 18,
+      "length_km": 1.645,
+      "road": "Park Road",
+      "capacity": 2500
+    },
+    {
+      "from": 3,
+      "to": 18,
+      "length_km": 1.038,
+      "road": "Fire Lane",
+      "capacity": 2800
+    },
+    {
+      "from": 3,
+      "to": 15,
+      "length_km": 1.516,
+      "road": "South Fire Road",
+      "capacity": 2600
+    },
+    {
+      "from": 5,
+      "to": 15,
+      "length_km": 1.014,
+      "road": "River West Road",
+      "capacity": 3000
+    },
+    {
+      "from": 5,
+      "to": 22,
+      "length_km": 1.487,
+      "road": "Mall Link Road",
+      "capacity": 2800
+    },
+    {
+      "from": 9,
+      "to": 24,
+      "length_km": 0.925,
+      "road": "North Road",
+      "capacity": 3200
+    },
+    {
+      "from": 9,
+      "to": 18,
+      "length_km": 0.934,
+      "road": "Green Way",
+      "capacity": 2200
+    },
+    {
+      "from": 18,
+      "to": 24,
+      "length_km": 1.35,
+      "road": "Ring West North",
+      "capacity": 3600
+    },
+    {
+      "from": 15,
+      "to": 25,
+      "length_km": 1.645,
+      "road": "Ring West South",
+      "capacity": 3000
+    },
+    {
+      "from": 22,
+      "to": 25,
+      "length_km": 1.181,
+      "road": "Ring South-West",
+      "capacity": 3400
+    },
+    {
+      "from": 15,
+      "to": 26,
+      "length_km": 0.702,
+      "road": "South Bridge Approach",
+      "capacity": 4200
+    },
+    {
+      "from": 25,
+      "to": 26,
+      "length_km": 1.606,
+      "road": "Ring South Link",
+      "capacity": 3600
+    },
+    {
+      "from": 18,
+      "to": 27,
+      "length_km": 0.749,
+      "road": "North Bridge Approach",
+      "capacity": 4200
+    },
+    {
+      "from": 24,
+      "to": 27,
+      "length_km": 1.136,
+      "road": "Ring North Link",
+      "capacity": 3800
+    },
+    {
+      "from": 27,
+      "to": 23,
+      "length_km": 0.903,
+      "road": "North Bridge Road",
+      "capacity": 4500
+    },
+    {
+      "from": 26,
+      "to": 8,
+      "length_km": 0.903,
+      "road": "South Bridge Road",
+      "capacity": 4500
+    },
+    {
+      "from": 26,
+      "to": 21,
+      "length_km": 1.365,
+      "road": "Waterfront Road",
+      "capacity": 3000
+    },
+    {
+      "from": 26,
+      "to": 11,
+      "length_km": 0.845,
+      "road": "Stadium Link",
+      "capacity": 3200
+    },
+    {
+      "from": 23,
+      "to": 8,
+      "length_km": 1.957,
+      "road": "Central East Road",
+      "capacity": 3800
+    },
+    {
+      "from": 23,
+      "to": 1,
+      "length_km": 1.213,
+      "road": "Sunrise Avenue",
+      "capacity": 3200
+    },
+    {
+      "from": 23,
+      "to": 4,
+      "length_km": 1.47,
+      "road": "North East Road",
+      "capacity": 3000
+    },
+    {
+      "from": 1,
+      "to": 4,
+      "length_km": 0.973,
+      "road": "Hospital North Rd",
+      "capacity": 2600
+    },
+    {
+      "from": 1,
+      "to": 10,
+      "length_km": 0.934,
+      "road": "Shelter Road East",
+      "capacity": 2600
+    },
+    {
+      "from": 1,
+      "to": 16,
+      "length_km": 1.254,
+      "road": "Hill Road",
+      "capacity": 2400
+    },
+    {
+      "from": 4,
+      "to": 16,
+      "length_km": 1.162,
+      "road": "Hill North Road",
+      "capacity": 2400
+    },
+    {
+      "from": 10,
+      "to": 4,
+      "length_km": 1.9,
+      "road": "NE Shelter Road",
+      "capacity": 2400
+    },
+    {
+      "from": 16,
+      "to": 13,
+      "length_km": 1.033,
+      "road": "Tech Hill Road",
+      "capacity": 2600
+    },
+    {
+      "from": 13,
+      "to": 14,
+      "length_km": 1.289,
+      "road": "Campus Road",
+      "capacity": 3000
+    },
+    {
+      "from": 13,
+      "to": 10,
+      "length_km": 1.102,
+      "road": "Tech Shelter Lane",
+      "capacity": 2400
+    },
+    {
+      "from": 14,
+      "to": 17,
+      "length_km": 1.988,
+      "road": "Lake Road",
+      "capacity": 2600
+    },
+    {
+      "from": 14,
+      "to": 6,
+      "length_km": 1.409,
+      "road": "University Road",
+      "capacity": 2800
+    },
+    {
+      "from": 6,
+      "to": 8,
+      "length_km": 1.523,
+      "road": "Police East Road",
+      "capacity": 3200
+    },
+    {
+      "from": 6,
+      "to": 17,
+      "length_km": 1.301,
+      "road": "East Colony Road",
+      "capacity": 2400
+    },
+    {
+      "from": 17,
+      "to": 19,
+      "length_km": 1.464,
+      "road": "Industrial Road",
+      "capacity": 2800
+    },
+    {
+      "from": 19,
+      "to": 2,
+      "length_km": 1.01,
+      "road": "Green Valley Road",
+      "capacity": 2600
+    },
+    {
+      "from": 19,
+      "to": 20,
+      "length_km": 1.198,
+      "road": "Power Road",
+      "capacity": 3000
+    },
+    {
+      "from": 2,
+      "to": 11,
+      "length_km": 1.181,
+      "road": "Valley Stadium Rd",
+      "capacity": 2800
+    },
+    {
+      "from": 2,
+      "to": 20,
+      "length_km": 1.367,
+      "road": "Plant South Road",
+      "capacity": 2400
+    },
+    {
+      "from": 20,
+      "to": 21,
+      "length_km": 1.348,
+      "road": "Utility Road",
+      "capacity": 2600
+    },
+    {
+      "from": 21,
+      "to": 11,
+      "length_km": 1.243,
+      "road": "Waterworks Road",
+      "capacity": 2800
+    },
+    {
+      "from": 11,
+      "to": 8,
+      "length_km": 0.734,
+      "road": "Stadium Avenue",
+      "capacity": 3400
+    }
+  ]
+}
