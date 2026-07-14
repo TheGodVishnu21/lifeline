@@ -8,9 +8,19 @@ CXX      = g++
 CXXFLAGS = -std=c++17 -O2 -Wall -Iinclude -Isrc
 LDFLAGS  = -pthread
 
-# Windows (MSYS2 / MinGW-w64): cpp-httplib needs winsock
+# Windows (MSYS2 / MinGW-w64): cpp-httplib needs winsock.
+# $(OS) covers cmd/PowerShell; uname covers MSYS2 login shells, which
+# strip the OS env var (they report e.g. MINGW64_NT-10.0 / MSYS_NT-10.0).
+UNAME_S := $(shell uname -s 2>/dev/null)
 ifeq ($(OS),Windows_NT)
-LDFLAGS += -lws2_32
+WIN = 1
+else ifneq (,$(findstring _NT,$(UNAME_S)))
+WIN = 1
+endif
+# -static: bundle libstdc++/libgcc/winpthread so lifeline.exe runs outside
+# the MSYS2 shell (plain PowerShell / double-click) without DLL errors.
+ifdef WIN
+LDFLAGS += -lws2_32 -static
 endif
 
 # Opt-in SQLite: `make USE_SQLITE=1`. Off by default so the project builds
