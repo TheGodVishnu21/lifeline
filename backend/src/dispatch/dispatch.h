@@ -8,7 +8,7 @@
 //   2. GREEDY ASSIGNMENT — pop the most severe incident, then pick the
 //      nearest AVAILABLE compatible vehicle by real road distance
 //      (Dijkstra from routing/). Locally-optimal each step = the classic
-//      greedy strategy; we log the choice so the viva can discuss where
+//      greedy strategy; each choice is logged, making it easy to see where
 //      greedy is/ isn't globally optimal.
 //
 // A vehicle serves one incident at a time (becomes unavailable). Incidents

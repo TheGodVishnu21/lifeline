@@ -2,241 +2,262 @@
 
 A DSA-driven full-stack project: a fictional city (**Indrapur**, 28 locations,
 48 roads) modelled as a weighted graph, with a C++ engine that routes
-emergency vehicles, and (in later phases) simulates disasters, computes
-evacuation capacity with max-flow, and analyses network resilience.
+emergency vehicles, simulates disasters, computes evacuation capacity with
+max-flow, dispatches rescue units, and analyses network resilience — all on
+data structures and algorithms written from scratch.
 
-**Phase 1 (this code): Routing Engine** — Dijkstra + A* on a custom
-min-heap, REST API, interactive dark-map demo UI.
+## Highlights
 
----
+- **Custom data structures, no STL shortcuts** — binary min-heap & max-heap,
+  separate-chaining hash map (djb2), trie, and Union-Find, all hand-written
+  in `backend/src/ds/`.
+- **10+ classic algorithms in production paths** — Dijkstra, A*,
+  Bellman-Ford, Floyd-Warshall, Edmonds-Karp max-flow + min-cut, BFS disaster
+  spread, Tarjan bridges/articulation points, Prim & Kruskal MST,
+  0/1 knapsack DP, greedy dispatch.
+- **Zero-dependency C++17 backend** — single static binary that serves both
+  the REST API and the built React frontend (cpp-httplib, header-only).
+- **React (Vite) command center** — interactive dark map with live disaster
+  zones, reroutes, dispatch paths, and network analytics.
+- **96 automated checks across 5 test suites**, cross-verified against
+  `networkx` on the real city graph.
 
 ## Repo layout
 
-```
+```text
 lifeline/
 ├── backend/
 │   ├── include/            httplib.h, json.hpp (third-party, header-only)
 │   ├── src/
-│   │   ├── core/           graph.h/.cpp, city_loader   ← FROZEN interface
+│   │   ├── core/           graph.h/.cpp, city_loader (frozen interface)
 │   │   ├── ds/             min_heap, max_heap, hash_map, trie (all custom)
-│   │   ├── routing/        dijkstra (+dijkstraAll), astar      ← Member 1
-│   │   ├── evacuation/     Edmonds-Karp max flow + min cut     ← Member 2
-│   │   ├── dispatch/       triage+greedy dispatch, knapsack    ← Member 3
-│   │   ├── resilience/     UnionFind, Tarjan, Prim+Kruskal  ← Member 4
+│   │   ├── routing/        dijkstra (+dijkstraAll), astar,
+│   │   │                   bellman_ford, floyd_warshall
+│   │   ├── evacuation/     Edmonds-Karp max flow + min cut
+│   │   ├── dispatch/       triage + greedy dispatch, knapsack supplies
+│   │   ├── resilience/     UnionFind, Tarjan, Prim + Kruskal
 │   │   ├── simulation/     BFS disaster spread
 │   │   ├── db/             history (SQLite optional, JSONL fallback)
 │   │   ├── api/            REST server (cpp-httplib)
 │   │   └── main.cpp        server mode + console mode
 │   ├── data/city_graph.json
-│   ├── tests/              4 suites, 82 checks, networkx-verified
+│   ├── tests/              5 suites, 96 checks, networkx-verified
 │   └── Makefile            `make`, `make USE_SQLITE=1`, `make test`
-├── frontend-react/         React (Vite) command center  ← Member 5
+├── frontend-react/         React (Vite) command center
 │   └── dist/               prebuilt — served by ./lifeline at /
 ├── frontend/map.html       zero-build fallback UI
-├── docs/api_spec.md        backend↔frontend contract — change this FIRST
-├── docs/viva_pack.md       complexity table, 20 Q&A, demo script
+├── docs/api_spec.md        backend↔frontend API contract
 └── tools/generate_city.py  regenerates city_graph.json (keeps A* admissible)
 ```
-
----
 
 ## Build & run — Linux / macOS / WSL
 
 ```bash
-cd backend
+git clone https://github.com/TheGodVishnu21/lifeline.git
+cd lifeline/backend
 make            # builds ./lifeline (zero external dependencies)
 ./lifeline      # REST server on http://localhost:8080
 ```
 
-Optional: `make USE_SQLITE=1` stores history in a real SQLite DB
-(needs `libsqlite3-dev`); the default build uses a JSONL file instead.
+Open **http://localhost:8080** — the demo map loads automatically.
 
-## Frontend (React)
-
-```bash
-cd frontend-react
-npm install
-npm run build        # -> dist/, which ./lifeline auto-serves at /
-```
-
-Restart `./lifeline` and open http://localhost:8080 — the React app is
-served by the C++ backend itself (no Node needed at runtime; a built
-`dist/` ships in the repo). For hot-reload development:
-`npm run dev` (Vite on :5173, /api proxied to :8080).
-`frontend/map.html` remains as a zero-build fallback UI.
-
-Open **http://localhost:8080** → the demo map loads automatically.
-
-Console mode (no browser needed): `./lifeline console`
-Custom port: `./lifeline 9090`
-Unit tests: `make test`
+- Optional SQLite history: `make USE_SQLITE=1` (needs `libsqlite3-dev`);
+  the default build logs to a JSONL file instead.
+- Console mode (no browser needed): `./lifeline console`
+- Custom port: `./lifeline 9090`
+- Unit tests: `make test`
 
 ## Build & run — Windows (native, MSYS2)
 
 1. Install MSYS2 from https://www.msys2.org (one-time).
 2. Open the **"MSYS2 UCRT64"** shell and install the toolchain:
    ```bash
-   pacman -S --needed mingw-w64-ucrt-x86_64-gcc make unzip
+   pacman -S --needed mingw-w64-ucrt-x86_64-gcc make git
    ```
-3. Build and run (the Makefile auto-adds `-lws2_32` on Windows):
+3. Clone, build, run (the Makefile auto-adds `-lws2_32` on Windows):
    ```bash
-   cd /c/Users/<you>/Downloads/lifeline/backend
+   git clone https://github.com/TheGodVishnu21/lifeline.git
+   cd lifeline/backend
    make
    ./lifeline.exe
    ```
 
-Prefer WSL? `wsl --install`, then follow the Linux steps above — often
-the smoothest path on Windows.
+Prefer WSL? `wsl --install`, then follow the Linux steps above.
+
+## Frontend (React)
+
+A built `dist/` ships in the repo and is served by the C++ binary itself, so
+Node is **not** needed at runtime. To rebuild or develop:
+
+```bash
+cd frontend-react
+npm install
+npm run build        # -> dist/, which ./lifeline auto-serves at /
+npm run dev          # hot reload: Vite on :5173, /api proxied to :8080
+```
+
+`frontend/map.html` remains as a zero-build fallback UI.
 
 ---
 
-## 60-second demo script (for viva / class demo)
+## Feature tour
 
-1. `./lifeline` → open http://localhost:8080
-2. Route **Riverside Colony → Sunrise Hospital**, algorithm **Compare**.
-3. Point at the result: *same 4.78 km optimal path*, but Dijkstra settled
-   **24 nodes** vs A* only **8** — the haversine heuristic focuses the
-   search toward the goal.
-4. Hover any road → name + length. Hover any marker → location.
-5. `./lifeline console` → same engine, zero UI dependencies.
+### Routing (Dijkstra vs A*)
 
-Likely viva questions this phase already answers:
-- Why is the heuristic admissible? (Every road length ≥ straight-line
-  distance — enforced by `tools/generate_city.py` — so h never
-  overestimates.)
-- Why no `std::priority_queue`? (`src/ds/min_heap.h` is our own binary
-  heap: sift-up/sift-down, O(log n) push/pop, lazy deletion instead of
-  decrease-key.)
-- Why does A* explore fewer nodes but return the same distance?
-  (Admissible + consistent heuristic ⇒ optimality preserved.)
+Route **Riverside Colony → Sunrise Hospital** with algorithm **Compare**:
+both find the same 4.78 km optimal path, but Dijkstra settles **24 nodes**
+vs A*'s **8** — the haversine heuristic focuses the search toward the goal.
+Hover any road for its name and length.
 
----
+### Disaster + evacuation
 
-## 90-second demo script — Phase 2 (disaster + evacuation)
-
-1. Set spread radius to **1 ring**, epicenter **River Bridge South**,
-   click **Trigger disaster**. Roads inside the zone turn red/dashed,
-   expanding wave rings appear.
-2. Route **Riverside Colony → Sunrise Hospital**: it now goes 5.42 km over
-   the *North* bridge instead of the 4.78 km south route — the engine
-   rerouted around blocked roads automatically.
-3. Read the **Evacuation Capacity** panel: max people/hour the road
+1. Set spread radius to **1 ring**, epicenter **River Bridge South**, click
+   **Trigger disaster**. Roads inside the zone turn red/dashed with
+   expanding wave rings.
+2. The same route now goes 5.42 km over the *North* bridge instead of the
+   4.78 km south route — the engine reroutes around blocked roads
+   automatically.
+3. The **Evacuation Capacity** panel shows the max people/hour the road
    network can push to safe shelters, plus the exact **min-cut bottleneck
    roads**.
 4. Bump radius to **2 rings**: the flood cuts both southern approaches and
    the west→east route becomes impossible — the map shows why.
-5. **Clear** → everything reopens, shortest route returns.
+5. **Clear** → everything reopens, the shortest route returns.
 
-Phase-2 viva questions this answers:
-- What is a disaster's "spread"? (Level-order BFS from the epicenter; each
-  ring = one hop. `src/simulation/disaster.cpp`.)
-- Why Edmonds-Karp, not plain Ford-Fulkerson? (We pick augmenting paths
-  with **BFS** — shortest path in edges — which bounds it to O(V·E²) and
-  avoids the pathological slow cases. `src/evacuation/max_flow.cpp`.)
-- What are the bottleneck roads? (The **min cut** — found by BFS over the
-  residual graph after max flow. Their capacities sum to the max flow;
-  the unit tests assert this on the real city.)
-- Why super-source/super-sink? (Many danger nodes → many shelters is a
-  multi-source multi-sink problem; S and T with ∞-capacity arcs reduce it
-  to a single-pair max flow.)
+### Dispatch + supplies
 
-## 60-second demo script — Phase 3 (dispatch + supplies)
-
-1. Trigger a **1-ring flood at River Bridge South**, then click
-   **🚑 Dispatch units**. Amber dashed lines = each vehicle's actual
-   drive path; badges show severity (epicenter zone = highest).
-2. Point out the order: most severe incidents got vehicles FIRST
-   (triage max-heap), and each got its **nearest** free compatible
-   vehicle by road distance (greedy + Dijkstra).
-3. Note any ⚠ unreachable incidents — the flood cut their roads; this
+1. With the flood active, click **🚑 Dispatch units**. Amber dashed lines
+   show each vehicle's actual drive path; badges show severity (epicenter
+   zone = highest).
+2. Most severe incidents get vehicles **first** (triage max-heap), and each
+   gets its **nearest** free compatible vehicle by road distance
+   (greedy + Dijkstra).
+3. Any ⚠ unreachable incidents are ones whose roads the flood cut — this
    ties directly back to the min-cut analysis.
-4. Click **📦 Load truck**: 50 kg capacity, the knapsack DP picks the
+4. **📦 Load truck**: 50 kg capacity; the knapsack DP picks the
    highest-relief-value subset (not the greedy value/weight order!).
-5. The **Activity Log** at the bottom is persisted — restart the server
-   and it's still there (SQLite or JSONL file).
+5. The **Activity Log** is persisted — restart the server and it's still
+   there (SQLite or JSONL).
 
-Phase-3 viva questions this answers:
-- Why a MAX-heap for triage, and how are ties broken? (Custom binary
-  max-heap in `src/ds/max_heap.h`; a monotonic sequence number makes
-  equal severities FIFO — stable triage.)
-- Is greedy assignment globally optimal? (**No** — it's locally optimal
-  per incident. Globally optimal assignment is min-cost matching /
-  Hungarian algorithm, O(n³). We chose greedy because dispatch is an
-  *online* problem — incidents arrive over time — and greedy is what
-  real CAD systems approximate. Great discussion answer.)
-- Why ONE Dijkstra per incident instead of per vehicle?
-  (`dijkstraAll()` gives distances to ALL vehicles in a single run;
-  the road graph is undirected so distance(vehicle→incident) =
-  distance(incident→vehicle).)
-- Knapsack: recurrence, why integer weights, how the chosen set is
-  recovered (backtracking the DP table — `src/dispatch/supply.cpp`).
-- Where is the custom hash map used? (Fleet counting in the dispatch
-  response — separate chaining, djb2 hash, load-factor 0.75 doubling.)
-- Why is SQLite optional? (Compile-time `#ifdef USE_SQLITE` switch with
-  a JSONL fallback — zero-dependency default build; identical History
-  interface either way. `src/db/history.cpp`.)
+### Resilience + search
 
-## 60-second demo script — Phase 4 (resilience + search)
-
-1. Type `riv` in the search box — Trie prefix search suggests all three
+1. Type `riv` in the search box — trie prefix search suggests all three
    River locations instantly; click one to fly there.
-2. Click **🕸 Analyze network** on the healthy city: *0 bridges,
-   0 articulation points* — "hamari city me single point of failure hai
-   hi nahi, min degree 3 rakha hai."
-3. Trigger the flood at River Bridge South, analyze again: suddenly
-   **5 critical roads + 7 critical junctions** appear in violet, and
-   River Bridge South is isolated with no hospital reachable. Same
-   Tarjan DFS, different road state.
-4. Click **🌿 Restoration plan**: the 28.07 km green backbone — and the
-   proof line "Prim = Kruskal, two algorithms, one optimum."
-
-Phase-4 viva questions this answers:
-- How does ONE DFS find both bridges and articulation points?
-  (disc/low arrays; bridge iff `low[child] > disc[u]`, AP iff
-  `low[child] >= disc[u]`, root rule = 2+ children.
-  `src/resilience/critical.cpp`.)
-- Union-Find complexity? (Path halving + union by rank ⇒ amortised
-  inverse-Ackermann, effectively O(1). `src/resilience/union_find.h`.)
-- Prim vs Kruskal — when to prefer which? (Prim O(E log V) suits dense
-  graphs, Kruskal O(E log E) suits sparse; we run BOTH and assert equal
-  totals — with distinct edge weights the MST is unique.)
-- Where is sorting? (Kruskal's edge ordering is a HEAPSORT through our
-  own MinHeap — no `std::sort`.)
-- Trie vs hashmap for autocomplete? (Prefix queries in O(L) — a hashmap
-  can't enumerate "everything starting with riv" without a full scan.)
-- Why does the healthy city report nothing critical? (Every node has
-  degree ≥ 3 and the mesh is 2-edge-connected — deliberate data design;
-  disasters are what create critical structure.)
-
-## Team map (who reads what)
-
-| Member | Module | Start with |
-|--------|--------------------------|-----------------------------------|
-| 1 | Routing | `src/routing/`, `src/ds/min_heap.h` |
-| 2 | Evacuation (max flow) | `src/core/graph.h` (`capacity` field is for you) |
-| 3 | Dispatch (heaps/DP) | `src/dispatch/`, `src/ds/max_heap.h`, `src/ds/hash_map.h` |
-| 4 | Resilience (UF/MST/bridges) | `src/resilience/`, `src/ds/trie.h` |
-| 5 | Frontend | `frontend-react/src/` + `docs/api_spec.md` |
-
-Git rule: one branch per module (`routing`, `evacuation`, `dispatch`,
-`resilience`, `frontend`), PRs into `main`, no direct pushes.
+2. **🕸 Analyze network** on the healthy city: *0 bridges, 0 articulation
+   points* — the city was deliberately designed with no single point of
+   failure (minimum degree 3, 2-edge-connected mesh).
+3. Trigger the flood and analyze again: **5 critical roads + 7 critical
+   junctions** appear in violet, and River Bridge South is isolated with no
+   hospital reachable. Same Tarjan DFS, different road state.
+4. **🌿 Restoration plan**: the 28.07 km green backbone — with the proof
+   line "Prim = Kruskal, two algorithms, one optimum."
 
 ---
 
-## Roadmap
+## Design decisions (FAQ)
+
+**Why is the A\* heuristic admissible?**
+Every road length ≥ straight-line distance — enforced by
+`tools/generate_city.py` — so h never overestimates. Admissible + consistent
+⇒ A* explores fewer nodes yet returns the same optimal distance.
+
+**Why no `std::priority_queue`?**
+`src/ds/min_heap.h` is our own binary heap: sift-up/sift-down, O(log n)
+push/pop, lazy deletion instead of decrease-key.
+
+**What is a disaster's "spread"?**
+Level-order BFS from the epicenter; each ring = one hop
+(`src/simulation/disaster.cpp`).
+
+**Why Edmonds-Karp, not plain Ford-Fulkerson?**
+Augmenting paths are picked with **BFS** (shortest in edges), which bounds
+the algorithm to O(V·E²) and avoids the pathological slow cases
+(`src/evacuation/max_flow.cpp`).
+
+**How are the bottleneck roads found?**
+The **min cut** — a BFS over the residual graph after max flow. Their
+capacities sum to the max flow; the unit tests assert this on the real city.
+
+**Why a super-source/super-sink?**
+Many danger nodes → many shelters is a multi-source multi-sink problem;
+S and T with ∞-capacity arcs reduce it to single-pair max flow.
+
+**Why a MAX-heap for triage, and how are ties broken?**
+Custom binary max-heap in `src/ds/max_heap.h`; a monotonic sequence number
+makes equal severities FIFO — stable triage.
+
+**Is greedy assignment globally optimal?**
+No — it's locally optimal per incident. The globally optimal assignment is
+min-cost matching (Hungarian algorithm, O(n³)). Greedy was chosen because
+dispatch is an *online* problem — incidents arrive over time — and greedy is
+what real CAD systems approximate.
+
+**Why ONE Dijkstra per incident instead of per vehicle?**
+`dijkstraAll()` gives distances to ALL vehicles in a single run; the road
+graph is undirected, so distance(vehicle→incident) =
+distance(incident→vehicle).
+
+**How does knapsack loading work?**
+Classic 0/1 knapsack DP over integer weights; the chosen set is recovered by
+backtracking the DP table (`src/dispatch/supply.cpp`).
+
+**Where is the custom hash map used?**
+Fleet counting in the dispatch response — separate chaining, djb2 hash,
+load-factor 0.75 doubling.
+
+**Why is SQLite optional?**
+Compile-time `#ifdef USE_SQLITE` switch with a JSONL fallback —
+zero-dependency default build; identical History interface either way
+(`src/db/history.cpp`).
+
+**How does ONE DFS find both bridges and articulation points?**
+disc/low arrays; bridge iff `low[child] > disc[u]`, articulation point iff
+`low[child] >= disc[u]`, root rule = 2+ children
+(`src/resilience/critical.cpp`).
+
+**Union-Find complexity?**
+Path halving + union by rank ⇒ amortised inverse-Ackermann, effectively O(1)
+(`src/resilience/union_find.h`).
+
+**Prim vs Kruskal — why run both?**
+Prim O(E log V) suits dense graphs, Kruskal O(E log E) suits sparse; both
+run and their totals are asserted equal — with distinct edge weights the MST
+is unique. Kruskal's edge ordering is a **heapsort** through our own MinHeap,
+not `std::sort`.
+
+**Trie vs hash map for autocomplete?**
+Prefix queries in O(L) — a hash map can't enumerate "everything starting
+with riv" without a full scan.
+
+---
+
+## Testing
+
+```bash
+cd backend
+make test
+```
+
+5 suites (`routing`, `evacuation`, `dispatch`, `resilience`, `analytics`),
+**96 checks**, all cross-verified against `networkx` on the real Indrapur
+graph — shortest paths on all 784 node pairs, max-flow/min-cut duality,
+bridge/articulation sets, MST totals, graph diameter and centrality.
+
+## Project phases
 
 - [x] **P1 Routing** — graph core, Dijkstra, A*, REST, demo map
 - [x] **P2 Evacuation** — disaster spread (BFS), live road blocking,
-      Ford-Fulkerson/Edmonds-Karp max flow, min-cut bottlenecks
+      Edmonds-Karp max flow, min-cut bottlenecks
 - [x] **P3 Dispatch** — custom max-heap triage, one-Dijkstra-per-incident
-      greedy assignment, 0/1 knapsack supply loading, history log
+      greedy assignment, 0/1 knapsack supply loading, persistent history
       (SQLite via `make USE_SQLITE=1`, zero-dependency JSONL otherwise)
 - [x] **P4 Resilience** — Union-Find (path halving + rank), Tarjan
       bridges/articulation points (networkx-verified), Prim + Kruskal MST
       (heap-sorted, totals cross-checked), Trie autocomplete
 - [x] **P5 Frontend + Integration** — React (Vite) command center served
       by the C++ backend, Bellman-Ford + Floyd-Warshall algorithm lab,
-      city analytics, docs/viva_pack.md
+      city analytics
 
-**PROJECT COMPLETE** — every synopsis concept implemented, used, and
-tested (96 checks + networkx cross-verification).
+## License
+
+[MIT](LICENSE)

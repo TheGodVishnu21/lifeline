@@ -15,4 +15,6 @@ nohup.out
 __pycache__/
 node_modules/
 dist/.vite
-.claude/
+docs/reference.docx
+docs/reference_patched.docx
+docs/report_docx.md

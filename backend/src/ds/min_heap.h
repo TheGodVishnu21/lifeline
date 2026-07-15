@@ -2,7 +2,7 @@
 // -----------------------------------------------------------------------
 // Custom binary min-heap (array-based). We deliberately do NOT use
 // std::priority_queue: implementing the heap ourselves is the point of a
-// DSA project, and it is a guaranteed viva question.
+// DSA project.
 //
 // Complexity:  push O(log n) | pop O(log n) | top O(1)
 // Layout:      parent(i) = (i-1)/2, children = 2i+1, 2i+2

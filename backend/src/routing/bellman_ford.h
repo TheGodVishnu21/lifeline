@@ -14,8 +14,7 @@
 //      work. That contrast is the point of the Algorithm Lab.
 //
 // Road lengths are never negative in LifeLine, so the negative-cycle
-// detection pass is deliberately omitted (documented in the .cpp) —
-// a good viva talking point.
+// detection pass is deliberately omitted (documented in the .cpp).
 //
 // Complexity O(V * E). nodes_explored in the result counts SUCCESSFUL
 // relaxations, making "work done" comparable across algorithms.
