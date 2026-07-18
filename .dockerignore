@@ -1,0 +1,10 @@
+.git
+.vscode
+frontend/
+frontend-react/node_modules
+frontend-react/src
+tools/
+docs/
+backend/tests/
+*.exe
+db/
