@@ -12,7 +12,7 @@ export default function AnalyticsPanel({
   return (
     <>
       <div className="divider" />
-      <div className="section-tag" style={{ color: '#7dd3fc' }}>
+      <div className="section-tag" style={{ color: '#1f6f9e' }}>
         ALGORITHM LAB
       </div>
       <p className="sub">
@@ -38,14 +38,14 @@ export default function AnalyticsPanel({
             ['A*', compare.astar],
             ['Bellman-Ford', compare.bellman_ford],
           ].map(([name, r]) => (
-            <div key={name} className="cut-item" style={{ borderLeftColor: '#7dd3fc' }}>
+            <div key={name} className="cut-item" style={{ borderLeftColor: '#1f6f9e' }}>
               <span className="r">
                 {name}{' '}
                 <small style={{ color: 'var(--muted)' }}>
                   {r.effort} {r.effort_name}
                 </small>
               </span>
-              <span className="c" style={{ color: '#7dd3fc' }}>
+              <span className="c" style={{ color: '#1f6f9e' }}>
                 {r.found ? r.distance_km.toFixed(2) + ' km' : '—'} · {fmtUs(r.runtime_us)}
               </span>
             </div>
@@ -64,24 +64,24 @@ export default function AnalyticsPanel({
             Floyd-Warshall: {stats.fw_operations.toLocaleString()} ops in{' '}
             {fmtUs(stats.fw_runtime_us)}
           </div>
-          <div className="cut-item" style={{ borderLeftColor: '#7dd3fc' }}>
+          <div className="cut-item" style={{ borderLeftColor: '#1f6f9e' }}>
             <span className="r">City diameter</span>
-            <span className="c" style={{ color: '#7dd3fc' }}>
+            <span className="c" style={{ color: '#1f6f9e' }}>
               {stats.diameter_km.toFixed(2)} km
             </span>
           </div>
           <p className="race-note" style={{ margin: 0 }}>
             longest unavoidable trip: {stats.diameter_from} ↔ {stats.diameter_to}
           </p>
-          <div className="cut-item" style={{ borderLeftColor: '#7dd3fc' }}>
+          <div className="cut-item" style={{ borderLeftColor: '#1f6f9e' }}>
             <span className="r">Average trip</span>
-            <span className="c" style={{ color: '#7dd3fc' }}>
+            <span className="c" style={{ color: '#1f6f9e' }}>
               {stats.avg_distance_km.toFixed(2)} km
             </span>
           </div>
-          <div className="cut-item" style={{ borderLeftColor: '#7dd3fc' }}>
+          <div className="cut-item" style={{ borderLeftColor: '#1f6f9e' }}>
             <span className="r">Most central: {stats.most_central}</span>
-            <span className="c" style={{ color: '#7dd3fc' }}>
+            <span className="c" style={{ color: '#1f6f9e' }}>
               ecc {stats.central_ecc_km.toFixed(2)} km
             </span>
           </div>

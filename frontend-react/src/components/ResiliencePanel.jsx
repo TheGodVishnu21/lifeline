@@ -8,7 +8,7 @@ export default function ResiliencePanel({
   return (
     <>
       <div className="divider" />
-      <div className="section-tag" style={{ color: '#b78bff' }}>
+      <div className="section-tag" style={{ color: '#6a44b8' }}>
         NETWORK RESILIENCE
       </div>
       <p className="sub">
