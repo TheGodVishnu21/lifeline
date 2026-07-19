@@ -6,6 +6,10 @@ emergency vehicles, simulates disasters, computes evacuation capacity with
 max-flow, dispatches rescue units, and analyses network resilience — all on
 data structures and algorithms written from scratch.
 
+**🌐 Live demo:** https://lifeline-31iq.onrender.com — free-tier Render
+instance, first load may take ~1 minute to cold-start.
+**📄 Project report:** [docs/report_final.pdf](docs/report_final.pdf)
+
 ## Highlights
 
 - **Custom data structures, no STL shortcuts** — binary min-heap & max-heap,
