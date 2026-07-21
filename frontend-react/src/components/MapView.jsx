@@ -34,7 +34,10 @@ export default function MapView({
     const map = L.map(divRef.current, { zoomControl: true })
       .setView([19.075, 72.882], 13);
     L.tileLayer(
-      'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
+      // label-free basemap: Indrapur is fictional, so the real place names
+      // underneath (these coords sit over Mumbai's western suburbs) must
+      // not show through. Roads/coastline stay for spatial context.
+      'https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png',
       {
         attribution:
           '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/">CARTO</a>',

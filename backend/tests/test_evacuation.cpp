@@ -110,7 +110,7 @@ static void testDisasterOnCity() {
     for (int id : r.path) via27 |= (id == 27);
     CHECK(r.found, "route 15->1 still exists after flood");
     CHECK(via27, "route 15->1 now crosses North Bridge (27)");
-    CHECK(r.distance_km > 4.79, "detour is longer than the 4.78 km original");
+    CHECK(r.distance_km > 4.78, "detour is longer than the 4.775 km original");
 
     // Block the north crossing too -> the river splits the city.
     simulateDisaster(g, 27, "flood", 1);

@@ -259,23 +259,24 @@ strategies, one optimum. Respects blocked roads.
 
 ## GET /api/citystats   *(Phase 5 — Floyd-Warshall analytics)*
 
-Full all-pairs matrix (O(V³) = 21,952 ops on 28 nodes) distilled into
+Full all-pairs matrix (O(V³) = 64,000 ops on 40 nodes) distilled into
 city-wide numbers. Recomputed on the CURRENT road state, so a disaster
 visibly degrades them.
 ```json
 {
-  "nodes": 28,
-  "fw_operations": 21952, "fw_runtime_us": 23.0,
-  "diameter_km": 8.114,
-  "diameter_from": "Hill View Colony", "diameter_to": "City Mall",
-  "avg_distance_km": 3.993,
-  "most_central": "Bus Terminal", "central_ecc_km": 4.643,
+  "nodes": 40,
+  "fw_operations": 64000, "fw_runtime_us": 62.0,
+  "diameter_km": 8.534,
+  "diameter_from": "Sector 7 Colony", "diameter_to": "Cargo Yard",
+  "avg_distance_km": 4.080,
+  "most_central": "River Bridge South", "central_ecc_km": 5.327,
   "least_central": "...", "remote_ecc_km": 0.0,
   "disconnected_pairs": 0
 }
 ```
-During a severity-2 flood the average trip length jumps (~3.99 → ~5.59
-km) and `disconnected_pairs` goes from 0 to 147 — one number that
+During a severity-2 flood at River Bridge South the average trip length
+jumps (~4.08 → ~5.92 km) and `disconnected_pairs` goes from 0 to 315 —
+one number that
 summarises how badly the network is hurt.
 
 ---

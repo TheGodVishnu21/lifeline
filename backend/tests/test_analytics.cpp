@@ -1,8 +1,8 @@
 // tests/test_analytics.cpp
 // Bellman-Ford and Floyd-Warshall must agree with Dijkstra everywhere,
-// and the city stats must match networkx ground truth:
-//   diameter 8.114 km (Hill View Colony <-> City Mall)
-//   average  3.993 km, most central = Bus Terminal (ecc 4.643)
+// and the city stats must match tools/verify_city.py ground truth:
+//   diameter 8.534 km (Sector 7 Colony <-> Cargo Yard)
+//   average  4.080 km, most central = River Bridge South (ecc 5.327)
 #include <cmath>
 #include <cstdio>
 #include <filesystem>
@@ -61,7 +61,7 @@ static void testBellmanFordVsDijkstra() {
             if (d.found != b.found || !near(d.distance_km, b.distance_km))
                 allEqual = false;
         }
-    CHECK(allEqual, "BF == Dijkstra on ALL 784 city pairs");
+    CHECK(allEqual, "BF == Dijkstra on ALL 1600 city pairs");
 
     // and with a disaster active (blocked edges respected)
     simulateDisaster(g, 26, "flood", 1);
@@ -82,7 +82,7 @@ static void testFloydWarshall() {
         for (int t = 0; t < g.size(); ++t)
             if (!near(one.dist[t], ap.dist[s][t])) allEqual = false;
     }
-    CHECK(allEqual, "FW matrix == Dijkstra from every source (784 pairs)");
+    CHECK(allEqual, "FW matrix == Dijkstra from every source (1600 pairs)");
 
     // path reconstruction via next matrix
     const auto p = ap.path(15, 1);
@@ -97,17 +97,17 @@ static void testFloydWarshall() {
     CHECK(chainOk && near(sum, ap.dist[15][1]),
           "FW next-matrix path 15->1 is a real road chain, length matches");
 
-    // networkx ground truth
+    // tools/verify_city.py ground truth
     const CityStats st = computeCityStats(ap);
-    CHECK(near(st.diameter_km, 8.114, 1e-3),
-          "diameter == 8.114 km (networkx ✓)");
-    CHECK((st.diameter_from == 16 && st.diameter_to == 22) ||
-          (st.diameter_from == 22 && st.diameter_to == 16),
-          "diameter pair == Hill View Colony <-> City Mall");
-    CHECK(near(st.avg_distance_km, 3.993, 1e-3),
-          "average distance == 3.993 km (networkx ✓)");
-    CHECK(st.most_central == 8 && near(st.central_ecc_km, 4.643, 1e-3),
-          "most central == Bus Terminal, ecc 4.643 (networkx ✓)");
+    CHECK(near(st.diameter_km, 8.534, 1e-3),
+          "diameter == 8.534 km (verifier ✓)");
+    CHECK((st.diameter_from == 28 && st.diameter_to == 37) ||
+          (st.diameter_from == 37 && st.diameter_to == 28),
+          "diameter pair == Sector 7 Colony <-> Cargo Yard");
+    CHECK(near(st.avg_distance_km, 4.080, 1e-3),
+          "average distance == 4.080 km (verifier ✓)");
+    CHECK(st.most_central == 26 && near(st.central_ecc_km, 5.327, 1e-3),
+          "most central == River Bridge South, ecc 5.327 (verifier ✓)");
     CHECK(st.disconnected_pairs == 0, "healthy city: 0 disconnected pairs");
 }
 

@@ -79,8 +79,8 @@ static void testRealCity() {
     }
 
     Graph g = loadCityFromJson(path, nullptr);
-    CHECK(g.size() == 28, "city has 28 nodes");
-    CHECK(g.edgeCount() == 48, "city has 48 edges");
+    CHECK(g.size() == 40, "city has 40 nodes");
+    CHECK(g.edgeCount() == 83, "city has 83 edges");
 
     bool allFound = true, allEqual = true, aStarNeverWorse = true;
     for (int s = 0; s < g.size(); ++s) {
@@ -92,7 +92,7 @@ static void testRealCity() {
             if (a.nodes_explored > d.nodes_explored) aStarNeverWorse = false;
         }
     }
-    CHECK(allFound, "all 28x28 pairs reachable (city connected)");
+    CHECK(allFound, "all 40x40 pairs reachable (city connected)");
     CHECK(allEqual, "A* distance == Dijkstra distance on ALL pairs (optimal)");
     CHECK(aStarNeverWorse, "A* never explores more nodes than Dijkstra");
 

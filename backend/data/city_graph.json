@@ -196,6 +196,90 @@
       "type": "bridge",
       "lat": 19.09,
       "lon": 72.877
+    },
+    {
+      "id": 28,
+      "name": "Sector 7 Colony",
+      "type": "residential",
+      "lat": 19.094,
+      "lon": 72.855
+    },
+    {
+      "id": 29,
+      "name": "Civic Center",
+      "type": "office",
+      "lat": 19.083,
+      "lon": 72.855
+    },
+    {
+      "id": 30,
+      "name": "West Fire Station",
+      "type": "fire_station",
+      "lat": 19.066,
+      "lon": 72.858
+    },
+    {
+      "id": 31,
+      "name": "Riverside Shelter",
+      "type": "shelter",
+      "lat": 19.071,
+      "lon": 72.874
+    },
+    {
+      "id": 32,
+      "name": "Grain Depot",
+      "type": "market",
+      "lat": 19.059,
+      "lon": 72.865
+    },
+    {
+      "id": 33,
+      "name": "North Gate Junction",
+      "type": "junction",
+      "lat": 19.101,
+      "lon": 72.866
+    },
+    {
+      "id": 34,
+      "name": "Trauma Center",
+      "type": "hospital",
+      "lat": 19.074,
+      "lon": 72.888
+    },
+    {
+      "id": 35,
+      "name": "East Bus Depot",
+      "type": "transit",
+      "lat": 19.08,
+      "lon": 72.895
+    },
+    {
+      "id": 36,
+      "name": "Lakeview School",
+      "type": "education",
+      "lat": 19.067,
+      "lon": 72.897
+    },
+    {
+      "id": 37,
+      "name": "Cargo Yard",
+      "type": "industrial",
+      "lat": 19.056,
+      "lon": 72.905
+    },
+    {
+      "id": 38,
+      "name": "Sunrise Shelter",
+      "type": "shelter",
+      "lat": 19.095,
+      "lon": 72.882
+    },
+    {
+      "id": 39,
+      "name": "East Ring Junction",
+      "type": "junction",
+      "lat": 19.06,
+      "lon": 72.893
     }
   ],
   "edges": [
@@ -534,6 +618,251 @@
       "length_km": 0.734,
       "road": "Stadium Avenue",
       "capacity": 3400
+    },
+    {
+      "from": 28,
+      "to": 9,
+      "length_km": 1.277,
+      "road": "Sector Link Road",
+      "capacity": 2600
+    },
+    {
+      "from": 28,
+      "to": 0,
+      "length_km": 0.812,
+      "road": "North West Road",
+      "capacity": 2600
+    },
+    {
+      "from": 28,
+      "to": 33,
+      "length_km": 1.533,
+      "road": "Sector North Road",
+      "capacity": 2600
+    },
+    {
+      "from": 29,
+      "to": 7,
+      "length_km": 0.864,
+      "road": "Civic Road",
+      "capacity": 3000
+    },
+    {
+      "from": 29,
+      "to": 12,
+      "length_km": 0.845,
+      "road": "Civic Market Lane",
+      "capacity": 2600
+    },
+    {
+      "from": 29,
+      "to": 0,
+      "length_km": 0.735,
+      "road": "Civic Hospital Road",
+      "capacity": 2400
+    },
+    {
+      "from": 30,
+      "to": 22,
+      "length_km": 0.541,
+      "road": "West Fire Road",
+      "capacity": 2800
+    },
+    {
+      "from": 30,
+      "to": 25,
+      "length_km": 1.683,
+      "road": "South West Fire Link",
+      "capacity": 2600
+    },
+    {
+      "from": 30,
+      "to": 15,
+      "length_km": 1.661,
+      "road": "Riverbank Fire Lane",
+      "capacity": 2400
+    },
+    {
+      "from": 31,
+      "to": 15,
+      "length_km": 0.505,
+      "road": "Riverside Shelter Road",
+      "capacity": 2600
+    },
+    {
+      "from": 31,
+      "to": 5,
+      "length_km": 1.235,
+      "road": "Shelter West Road",
+      "capacity": 2400
+    },
+    {
+      "from": 31,
+      "to": 3,
+      "length_km": 1.254,
+      "road": "Fire Shelter Road",
+      "capacity": 2400
+    },
+    {
+      "from": 32,
+      "to": 22,
+      "length_km": 0.685,
+      "road": "Depot Road",
+      "capacity": 2800
+    },
+    {
+      "from": 32,
+      "to": 25,
+      "length_km": 0.505,
+      "road": "Depot Ring Road",
+      "capacity": 2600
+    },
+    {
+      "from": 32,
+      "to": 7,
+      "length_km": 2.536,
+      "road": "Grain Line Road",
+      "capacity": 2400
+    },
+    {
+      "from": 33,
+      "to": 24,
+      "length_km": 0.749,
+      "road": "North Gate Road",
+      "capacity": 3400
+    },
+    {
+      "from": 33,
+      "to": 9,
+      "length_km": 0.979,
+      "road": "North Gate Link",
+      "capacity": 2800
+    },
+    {
+      "from": 34,
+      "to": 8,
+      "length_km": 0.673,
+      "road": "Trauma Road",
+      "capacity": 3000
+    },
+    {
+      "from": 34,
+      "to": 23,
+      "length_km": 1.539,
+      "road": "Trauma North Link",
+      "capacity": 2800
+    },
+    {
+      "from": 34,
+      "to": 6,
+      "length_km": 1.117,
+      "road": "Trauma East Road",
+      "capacity": 2600
+    },
+    {
+      "from": 35,
+      "to": 1,
+      "length_km": 1.107,
+      "road": "Depot Sunrise Road",
+      "capacity": 2600
+    },
+    {
+      "from": 35,
+      "to": 10,
+      "length_km": 0.59,
+      "road": "East Depot Lane",
+      "capacity": 2400
+    },
+    {
+      "from": 35,
+      "to": 23,
+      "length_km": 1.535,
+      "road": "Depot Central Road",
+      "capacity": 2800
+    },
+    {
+      "from": 36,
+      "to": 17,
+      "length_km": 0.849,
+      "road": "School Road",
+      "capacity": 2400
+    },
+    {
+      "from": 36,
+      "to": 6,
+      "length_km": 0.612,
+      "road": "School East Lane",
+      "capacity": 2400
+    },
+    {
+      "from": 36,
+      "to": 14,
+      "length_km": 1.881,
+      "road": "Campus South Road",
+      "capacity": 2600
+    },
+    {
+      "from": 37,
+      "to": 19,
+      "length_km": 0.946,
+      "road": "Cargo Road",
+      "capacity": 2800
+    },
+    {
+      "from": 37,
+      "to": 17,
+      "length_km": 0.927,
+      "road": "Cargo Lake Road",
+      "capacity": 2600
+    },
+    {
+      "from": 37,
+      "to": 20,
+      "length_km": 2.395,
+      "road": "Cargo Plant Road",
+      "capacity": 2400
+    },
+    {
+      "from": 38,
+      "to": 23,
+      "length_km": 1.125,
+      "road": "Sunrise Shelter Link",
+      "capacity": 2800
+    },
+    {
+      "from": 38,
+      "to": 1,
+      "length_km": 1.641,
+      "road": "Shelter Sunrise Road",
+      "capacity": 2600
+    },
+    {
+      "from": 38,
+      "to": 4,
+      "length_km": 0.975,
+      "road": "Shelter North Road",
+      "capacity": 2400
+    },
+    {
+      "from": 39,
+      "to": 2,
+      "length_km": 0.271,
+      "road": "East Ring Road",
+      "capacity": 2800
+    },
+    {
+      "from": 39,
+      "to": 11,
+      "length_km": 1.202,
+      "road": "East Ring Stadium Link",
+      "capacity": 2600
+    },
+    {
+      "from": 39,
+      "to": 19,
+      "length_km": 1.188,
+      "road": "East Ring Industrial",
+      "capacity": 2600
     }
   ]
 }

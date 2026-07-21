@@ -96,21 +96,21 @@ static void testCriticalOnCity() {
           "healthy city: 0 articulation points (networkx ✓)");
     CHECK(healthy.components == 1, "healthy city: 1 component");
 
-    // flood sev1 @ 26 — networkx says:
+    // flood sev1 @ 26 — tools/verify_city.py says:
     //   components = 2 (node 26 isolated)
-    //   bridges    = (2,11) (17,19) (20,21) (22,25) (23,27)
-    //   APs        = 2 17 19 20 22 23 27
+    //   bridges    = (20,21) (23,27)
+    //   APs        = 17 20 23 27
     simulateDisaster(g, 26, "flood", 1);
     auto r = analyzeCritical(g);
     CHECK(r.components == 2, "flooded: 2 components");
     CHECK(r.component_members.back() == std::vector<int>{26},
           "flooded: node 26 is the isolated component");
     const std::vector<std::pair<int, int>> expBridges =
-        {{2, 11}, {17, 19}, {20, 21}, {22, 25}, {23, 27}};
+        {{20, 21}, {23, 27}};
     CHECK(r.bridges == expBridges,
-          "flooded: 5 bridges match networkx exactly");
-    CHECK(r.articulation_points == (std::vector<int>{2, 17, 19, 20, 22, 23, 27}),
-          "flooded: 7 articulation points match networkx exactly");
+          "flooded: 2 bridges match the verifier exactly");
+    CHECK(r.articulation_points == (std::vector<int>{17, 20, 23, 27}),
+          "flooded: 4 articulation points match the verifier exactly");
 }
 
 static void testMst() {
@@ -119,19 +119,19 @@ static void testMst() {
     const auto p = primMst(g);
     const auto k = kruskalMst(g);
 
-    // networkx ground truth: 28.068 km, 27 edges
-    CHECK(p.edges.size() == 27, "Prim: 27 edges (n-1)");
-    CHECK(k.edges.size() == 27, "Kruskal: 27 edges (n-1)");
+    // verifier ground truth: 34.169 km, 39 edges
+    CHECK(p.edges.size() == 39, "Prim: 39 edges (n-1)");
+    CHECK(k.edges.size() == 39, "Kruskal: 39 edges (n-1)");
     CHECK(near(p.total_km, k.total_km),
           "Prim total == Kruskal total (same optimum)");
-    CHECK(near(p.total_km, 28.068, 1e-3),
-          "MST total == 28.068 km (networkx ✓)");
+    CHECK(near(p.total_km, 34.169, 1e-3),
+          "MST total == 34.169 km (verifier ✓)");
 
     // MST must span: every node appears in the edge set
     std::set<int> covered;
     for (const auto& e : p.edges) { covered.insert(e.u); covered.insert(e.v); }
     CHECK(static_cast<int>(covered.size()) == g.size(),
-          "Prim MST spans all 28 nodes");
+          "Prim MST spans all 40 nodes");
 
     // both trees must be acyclic + connected — verify with OUR UnionFind
     UnionFind uf(g.size());
@@ -146,12 +146,12 @@ static void testTrie() {
     Graph g = loadCityFromJson(cityPath(), nullptr);
     Trie trie;
     for (const Node& n : g.nodes()) trie.insert(n.name, n.id);
-    CHECK(trie.size() == 28, "trie holds all 28 names");
+    CHECK(trie.size() == 40, "trie holds all 40 names");
 
     auto riv = trie.suggest("riv");
     std::set<int> rivSet(riv.begin(), riv.end());
-    CHECK(rivSet == std::set<int>({15, 26, 27}),
-          "'riv' -> Riverside Colony + both River Bridges");
+    CHECK(rivSet == std::set<int>({15, 26, 27, 31}),
+          "'riv' -> Riverside Colony + Riverside Shelter + both River Bridges");
 
     CHECK(trie.suggest("RING ROAD").size() == 2,
           "case-insensitive: 'RING ROAD' -> 2 results");

@@ -1,7 +1,7 @@
 # LifeLine — Smart City Disaster Response & Evacuation Simulator
 
-A DSA-driven full-stack project: a fictional city (**Indrapur**, 28 locations,
-48 roads) modelled as a weighted graph, with a C++ engine that routes
+A DSA-driven full-stack project: a fictional city (**Indrapur**, 40 locations,
+83 roads) modelled as a weighted graph, with a C++ engine that routes
 emergency vehicles, simulates disasters, computes evacuation capacity with
 max-flow, dispatches rescue units, and analyses network resilience — all on
 data structures and algorithms written from scratch.
@@ -243,8 +243,9 @@ make test
 ```
 
 5 suites (`routing`, `evacuation`, `dispatch`, `resilience`, `analytics`),
-**96 checks**, all cross-verified against `networkx` on the real Indrapur
-graph — shortest paths on all 784 node pairs, max-flow/min-cut duality,
+**96 checks**, all cross-verified against `tools/verify_city.py` (an
+independent pure-Python re-implementation) on the real Indrapur
+graph — shortest paths on all 1600 node pairs, max-flow/min-cut duality,
 bridge/articulation sets, MST totals, graph diameter and centrality.
 
 ## Project phases
