@@ -6,13 +6,13 @@ import { useEffect, useRef } from 'react';
 import L from 'leaflet';
 
 const TYPE_COLORS = {
-  hospital: '#ff5d73', fire_station: '#ffa02e', police: '#4ea8ff',
-  shelter: '#58d68d', transit: '#c39bff', infrastructure: '#9d7bff',
-  bridge: '#ffd166', market: '#f2a1c0', office: '#7dd3fc',
-  education: '#7dd3fc', residential: '#8fa0b8', industrial: '#b8a58f',
-  junction: '#5d6b82',
+  hospital: '#ff4d6d', fire_station: '#fb923c', police: '#38bdf8',
+  shelter: '#10b981', transit: '#c084fc', infrastructure: '#818cf8',
+  bridge: '#facc15', market: '#f472b6', office: '#2dd4bf',
+  education: '#93c5fd', residential: '#94a3b8', industrial: '#d4a373',
+  junction: '#475569',
 };
-const WAVE_COLORS = ['#ff5d73', '#ff8a4c', '#ffb020'];
+const WAVE_COLORS = ['#ff4d6d', '#fb923c', '#facc15'];
 
 const edgeKey = (u, v) => `${Math.min(u, v)}-${Math.max(u, v)}`;
 
@@ -63,14 +63,14 @@ export default function MapView({
     city.edges.forEach((e) => {
       const a = city.nodes[e.from], b = city.nodes[e.to];
       const line = L.polyline([[a.lat, a.lon], [b.lat, b.lon]], {
-        color: '#223048', weight: 1.6, opacity: 0.85,
+        color: '#1e2a3e', weight: 1.6, opacity: 0.85,
       }).bindTooltip(`${e.road} · ${e.length_km} km`, { sticky: true })
         .addTo(map);
       edgeLines.current[edgeKey(e.from, e.to)] = line;
     });
 
     city.nodes.forEach((n) => {
-      const c = TYPE_COLORS[n.type] || '#8fa0b8';
+      const c = TYPE_COLORS[n.type] || '#94a3b8';
       const m = L.circleMarker([n.lat, n.lon], {
         radius: ['hospital', 'fire_station', 'shelter'].includes(n.type) ? 7 : 5,
         color: c, weight: 1.5, fillColor: c, fillOpacity: 0.55,
@@ -93,8 +93,8 @@ export default function MapView({
     );
     Object.entries(edgeLines.current).forEach(([key, line]) => {
       line.setStyle(blocked.has(key)
-        ? { color: '#ff5d73', weight: 2.2, opacity: 0.9, dashArray: '4 5' }
-        : { color: '#223048', weight: 1.6, opacity: 0.85, dashArray: null });
+        ? { color: '#ff4d6d', weight: 2.2, opacity: 0.95, dashArray: '4 5' }
+        : { color: '#1e2a3e', weight: 1.6, opacity: 0.85, dashArray: null });
     });
 
     if (!disaster) return;
@@ -110,8 +110,8 @@ export default function MapView({
     });
     const e = city.nodes[disaster.epicenter];
     L.circleMarker([e.lat, e.lon], {
-      radius: 9, color: '#fff', weight: 2,
-      fillColor: '#ff5d73', fillOpacity: 0.9,
+      radius: 9, color: '#ffffff', weight: 2,
+      fillColor: '#ff4d6d', fillOpacity: 0.9,
     }).bindTooltip(`Epicenter: ${disaster.epicenter_name}`).addTo(lg);
   }, [disaster, city]);
 
@@ -122,7 +122,7 @@ export default function MapView({
     lg.clearLayers();
     if (!routeCoords || routeCoords.length < 2) return;
     L.polyline(routeCoords, {
-      color: '#2dd4bf', weight: 4.5, opacity: 0.95,
+      color: '#00f0ff', weight: 4.5, opacity: 0.95,
       dashArray: '10 12', className: 'route-anim',
     }).addTo(lg);
     mapRef.current.fitBounds(routeCoords, { padding: [60, 60] });
@@ -137,12 +137,12 @@ export default function MapView({
     dispatchResult.assignments.forEach((a) => {
       if (a.coords && a.coords.length > 1)
         L.polyline(a.coords, {
-          color: '#ffb020', weight: 3, opacity: 0.8, dashArray: '6 6',
+          color: '#f59e0b', weight: 3, opacity: 0.85, dashArray: '6 6',
         }).addTo(lg);
       const inc = city.nodes[a.incident_node];
       L.circleMarker([inc.lat, inc.lon], {
-        radius: 6, color: '#ffb020', weight: 2,
-        fillColor: '#ff5d73', fillOpacity: 0.8,
+        radius: 6, color: '#f59e0b', weight: 2,
+        fillColor: '#ff4d6d', fillOpacity: 0.85,
       }).addTo(lg);
     });
   }, [dispatchResult, city]);
@@ -154,14 +154,14 @@ export default function MapView({
     lg.clearLayers();
     if (!resilience) return;
     resilience.bridges.forEach((b) => {
-      L.polyline(b.coords, { color: '#b78bff', weight: 5, opacity: 0.9 })
+      L.polyline(b.coords, { color: '#c084fc', weight: 5, opacity: 0.9 })
         .bindTooltip(`CRITICAL: ${b.road} — losing this splits the network`,
                      { sticky: true })
         .addTo(lg);
     });
     resilience.articulation_points.forEach((a) => {
       L.circleMarker([a.lat, a.lon], {
-        radius: 11, color: '#b78bff', weight: 2.5,
+        radius: 11, color: '#c084fc', weight: 2.5,
         fillOpacity: 0, dashArray: '3 3',
       }).bindTooltip(`CRITICAL JUNCTION: ${a.name}`).addTo(lg);
     });
@@ -174,7 +174,7 @@ export default function MapView({
     lg.clearLayers();
     if (!mstEdges) return;
     mstEdges.forEach((e) => {
-      L.polyline(e.coords, { color: '#58d68d', weight: 3.5, opacity: 0.75 })
+      L.polyline(e.coords, { color: '#10b981', weight: 3.5, opacity: 0.8 })
         .bindTooltip(`MST: ${e.road} · ${e.length_km} km`, { sticky: true })
         .addTo(lg);
     });
