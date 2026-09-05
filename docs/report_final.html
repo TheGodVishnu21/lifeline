@@ -1,0 +1,925 @@
+<!DOCTYPE html><html><head><meta charset='utf-8'><title>LifeLine — Disaster Response Simulator — Project Report</title><style>
+:root {
+  --ink: #1c2733; --muted: #5a6b7c; --accent: #0f766e; --accent-2: #b45309;
+  --rule: #d7dee6; --wash: #f2f6f8; --code-bg: #f5f5f2;
+}
+* { box-sizing: border-box; }
+html { font-size: 10.5pt; }
+body {
+  font-family: Georgia, 'Times New Roman', serif; color: var(--ink);
+  line-height: 1.55; margin: 0; counter-reset: fig;
+}
+@page { size: A4; margin: 22mm 20mm; }
+
+/* ---- front page ---- */
+.front-page {
+  page-break-after: always; height: 245mm; display: flex; flex-direction: column;
+  justify-content: center; text-align: center;
+}
+.front-top { margin-bottom: 16mm; }
+.front-mid { margin-bottom: 16mm; }
+.front-page p { text-align: center; }
+.front-top .college { font-family: 'Segoe UI', sans-serif; font-size: 14pt; font-weight: 600; letter-spacing: .04em; margin: 0 0 2mm; }
+.front-top .dept { color: var(--muted); font-size: 11pt; margin: 0; }
+.front-mid .kicker { font-family: 'Segoe UI', sans-serif; letter-spacing: .35em; color: var(--accent-2); font-size: 10pt; font-weight: 600; }
+.front-mid .title { font-family: 'Segoe UI', sans-serif; font-size: 44pt; margin: 4mm 0 0; color: var(--accent); letter-spacing: .01em; page-break-before: avoid; border-bottom: none; padding-bottom: 0; }
+.front-mid .subtitle { font-family: 'Segoe UI', sans-serif; font-size: 17pt; margin: 2mm 0 6mm; color: var(--ink); }
+.front-mid .tagline { max-width: 130mm; margin: 0 auto; color: var(--muted); font-style: italic; }
+.front-bottom .course { font-family: 'Segoe UI', sans-serif; font-weight: 600; margin-bottom: 4mm; }
+.team { width: auto; margin: 0 auto 5mm; border-collapse: collapse; font-family: 'Segoe UI', sans-serif; font-size: 10.5pt; }
+.team td { border: none; padding: 1.2mm 8mm; background: none !important; }
+.front-bottom .guide, .front-bottom .date { color: var(--muted); margin: 1mm 0; }
+
+/* ---- table of contents ---- */
+.toc-page { page-break-after: always; }
+.toc-title { font-family: 'Segoe UI', sans-serif; color: var(--accent); border-bottom: 2px solid var(--accent); padding-bottom: 2mm; }
+ol.toc { font-family: 'Segoe UI', sans-serif; font-size: 11.5pt; line-height: 2; }
+ol.toc ol { font-size: 10pt; color: var(--muted); line-height: 1.7; list-style: lower-alpha; }
+ol.toc a { color: var(--ink); text-decoration: none; }
+
+/* ---- headings ---- */
+h1, h2, h3 { font-family: 'Segoe UI', sans-serif; line-height: 1.25; page-break-after: avoid; }
+h1 { font-size: 20pt; color: var(--accent); page-break-before: always; border-bottom: 2px solid var(--accent); padding-bottom: 2mm; margin-top: 0; }
+h2 { font-size: 13.5pt; margin-top: 9mm; color: var(--ink); }
+h3 { font-size: 11.5pt; color: var(--muted); }
+
+/* ---- text ---- */
+p { text-align: justify; hyphens: auto; }
+a { color: var(--accent); text-decoration: none; }
+strong { color: inherit; }
+blockquote { margin: 0 0 0 5mm; padding-left: 4mm; border-left: 3px solid var(--rule); color: var(--muted); }
+
+/* ---- code ---- */
+code { font-family: Consolas, 'Courier New', monospace; font-size: .88em; background: var(--code-bg); padding: 0 .25em; border-radius: 2px; }
+pre { background: var(--code-bg); border: 1px solid var(--rule); border-left: 3px solid var(--accent); padding: 3mm 4mm; overflow-x: hidden; page-break-inside: avoid; border-radius: 2px; }
+pre code { background: none; padding: 0; font-size: 8.4pt; line-height: 1.45; }
+
+/* ---- tables ---- */
+table { border-collapse: collapse; width: 100%; margin: 4mm 0; font-family: 'Segoe UI', sans-serif; font-size: 9pt; page-break-inside: avoid; }
+th, td { border: 1px solid var(--rule); padding: 1.8mm 2.5mm; text-align: left; vertical-align: top; }
+thead th, tr:first-child th { background: var(--wash); color: var(--accent); font-weight: 600; }
+tbody tr:nth-child(even) td { background: #fafcfd; }
+
+/* ---- figures ---- */
+figure.shot { margin: 6mm 0; page-break-inside: avoid; text-align: center; }
+figure.shot img { max-width: 100%; border: 1px solid var(--rule); border-radius: 3px; }
+figure.shot figcaption { font-family: 'Segoe UI', sans-serif; font-size: 9pt; color: var(--muted); margin-top: 2mm; text-align: center; }
+figure.shot figcaption strong { color: var(--accent); }
+
+hr { border: none; border-top: 1px solid var(--rule); margin: 8mm 0; }
+ul, ol { padding-left: 6mm; }
+li { margin-bottom: 1mm; }
+</style></head><body>
+<section class="front-page">
+  <div class="front-top">
+    <p class="college">Lovely Professional University</p>
+    <p class="dept">Department of Computer Science &amp; Engineering</p>
+  </div>
+  <div class="front-mid">
+    <p class="kicker">PROJECT REPORT</p>
+    <h1 class="title">LifeLine</h1>
+    <p class="subtitle">Disaster Response Simulator</p>
+    <p class="tagline">A graph-algorithm engine for emergency routing, evacuation capacity,
+    vehicle dispatch, and network resilience &mdash; C++17 core, REST API, React map interface.</p>
+  </div>
+  <div class="front-bottom">
+    <p class="course">PETV140 &mdash; DSA PLACEMENT BOOTCAMP: MASTER DATA STRUCTURES AND ALGORITHMS FOR INDUSTRY</p>
+    <table class="team">
+      <tr><td>Ishaan Sandhwar</td><td>96</td></tr>
+      <tr><td>Harsh Sharma</td><td>76</td></tr>
+      <tr><td>Deepak Kumar Behera</td><td>77</td></tr>
+      <tr><td>Piyush Priyanshu</td><td>79</td></tr>
+      <tr><td>Aditya Shukla</td><td>47</td></tr>
+    </table>
+    <p class="guide">Submitted to: 32137-Mahipal Singh Papola, 33575-Deepak Kumar</p>
+    <p class="date">July 2026</p>
+    <p class="guide">Live demo: <a href="https://lifeline-31iq.onrender.com">lifeline-31iq.onrender.com</a> &nbsp;&middot;&nbsp; Source: <a href="https://github.com/TheGodVishnu21/lifeline">github.com/TheGodVishnu21/lifeline</a></p>
+  </div>
+</section>
+
+<section class="toc-page">
+  <h1 class="toc-title">Table of Contents</h1>
+  <ol class="toc">
+    <li><a href="#abstract">Abstract</a></li>
+    <li><a href="#introduction">Introduction</a>
+      <ol><li>Motivation</li><li>Problem statement</li><li>Objectives</li>
+      <li>System architecture</li><li>The dataset: Indrapur</li>
+      <li>Data structures implemented</li><li>REST API summary</li>
+      <li>Team organisation and report layout</li></ol></li>
+    <li><a href="#algorithm">Algorithm</a> &mdash; data structures &sect;2.1&ndash;2.5,
+        algorithms &sect;2.6&ndash;2.15, complexity summary &sect;2.16</li>
+    <li><a href="#results">Results</a>
+      <ol><li>Verification methodology</li><li>Test outcomes</li>
+      <li>Routing results (Figures 1&ndash;3)</li>
+      <li>Simulation, evacuation, dispatch, resilience (Figures 4&ndash;9)</li>
+      <li>City analytics and performance</li><li>Build and deployment</li></ol></li>
+    <li><a href="#conclusion">Conclusion</a></li>
+    <li><a href="#references">References</a></li>
+  </ol>
+</section>
+<h1 id="abstract">Abstract</h1>
+<p>Emergency response in a city is fundamentally a graph problem: roads are weighted edges, junctions and facilities are vertices, and every operational question — the fastest ambulance route, the evacuation capacity of a flooded district, the single road whose loss would split the city — corresponds to a classical algorithm on that graph. LifeLine is a full-stack disaster-response simulator built on this observation. A fictional city, <strong>Indrapur</strong> (40 locations, 83 roads), is modelled as a weighted undirected graph with per-road capacities. A C++17 engine implements shortest-path routing (Dijkstra, A*, Bellman-Ford, Floyd-Warshall), disaster spread simulation (breadth-first search), evacuation-capacity analysis (Edmonds-Karp maximum flow with minimum-cut extraction), emergency vehicle dispatch (max-heap triage with greedy assignment), relief-supply optimisation (0/1 knapsack dynamic programming), and network-resilience analysis (Tarjan’s bridge/articulation-point algorithm, Union-Find, and Prim’s and Kruskal’s minimum spanning tree algorithms). All supporting data structures — binary min-heap, binary max-heap, hash map, trie, union-find, and queue — are implemented from first principles; no STL container that would trivialise the coursework is used in algorithmic code. The engine is exposed through a REST API and operated from a React-based map interface. Correctness is established by 96 automated checks across five test suites, cross-algorithm agreement on all 1600 vertex pairs, and independent verification against <code>tools/verify_city.py</code>, an independent pure-Python implementation of the same algorithms.</p>
+<p><strong>Keywords:</strong> graph algorithms, shortest path, maximum flow, minimum spanning tree, heap, trie, dynamic programming, disaster management</p>
+<hr />
+<h1 id="introduction">1. Introduction</h1>
+<h2 id="motivation">1.1 Motivation</h2>
+<p>Natural disasters stress a city’s road network in ways that are difficult to reason about manually. When a flood closes a bridge, the shortest ambulance route changes; the number of people who can reach shelters per hour drops; junctions that were previously redundant become single points of failure. City control rooms answer these questions under time pressure, and each question is, at its core, an instance of a well-studied graph problem:</p>
+<ul>
+<li><em>“What is the fastest route for this ambulance right now?”</em> is a <strong>single-pair shortest path</strong> query on a graph whose edge set changes as roads close.</li>
+<li><em>“How many people per hour can evacuate the flooded zone into shelters?”</em> is a <strong>maximum-flow</strong> computation, and the roads that limit that number form a <strong>minimum cut</strong>.</li>
+<li><em>“Which one road, if lost, would disconnect the city?”</em> asks for the <strong>bridges</strong> of the graph; <em>“which junction?”</em> asks for its <strong>articulation points</strong>.</li>
+<li><em>“In what order do we repair roads to reconnect everything at minimum cost?”</em> is a <strong>minimum spanning tree</strong> problem.</li>
+<li><em>“Which incident does the only free fire truck go to first?”</em> is a <strong>priority-queue</strong> (triage) question followed by a <strong>greedy assignment</strong>.</li>
+<li><em>“Which relief supplies go on a truck with a fixed weight limit?”</em> is the <strong>0/1 knapsack</strong> problem.</li>
+</ul>
+<p>LifeLine packages these problems into one coherent, interactive product. Rather than presenting each course algorithm as an isolated exercise, the project embeds every algorithm in a live system where its output is visible on a map and its correctness is checked by automated tests. The result demonstrates not only that the algorithms were implemented, but that they were understood well enough to be composed into a working application: the disaster module’s BFS output feeds the triage heap; blocked edges from the simulation are respected transparently by every routing algorithm; the min cut computed by the evacuation module explains exactly why some dispatch incidents are reported unreachable.</p>
+<h2 id="problem-statement">1.2 Problem statement</h2>
+<p>Given a city road network represented as a weighted undirected graph with per-road capacities, build a system that can:</p>
+<ol type="a">
+<li>compute optimal emergency routes under dynamic road closures;</li>
+<li>simulate the spread of a disaster and its effect on the network;</li>
+<li>quantify evacuation capacity and identify the bottleneck roads that limit it;</li>
+<li>dispatch a limited fleet of emergency vehicles to prioritised incidents;</li>
+<li>optimise the loading of a relief-supply vehicle under a weight budget;</li>
+<li>analyse the structural resilience of the network before and after a disaster.</li>
+</ol>
+<h2 id="objectives">1.3 Objectives</h2>
+<ol type="1">
+<li>Model a realistic city as a weighted graph with properties chosen deliberately for algorithmic study (admissible A* heuristics, 2-edge-connectivity).</li>
+<li>Implement all required data structures (min-heap, max-heap, hash map, trie, union-find, queue) from first principles, without delegating to STL containers.</li>
+<li>Implement, analyse, and compare the classical algorithms listed above, stating and deriving the time and space complexity of each.</li>
+<li>Verify correctness through automated tests, cross-algorithm agreement, and an independent reference implementation (<code>tools/verify_city.py</code>).</li>
+<li>Expose the engine through a documented REST API and an interactive web interface suitable for live demonstration.</li>
+</ol>
+<h2 id="system-architecture">1.4 System architecture</h2>
+<p>The system is a two-tier application. A single C++17 executable contains the algorithm engine, an embedded HTTP server (the header-only <em>cpp-httplib</em> library), and a static file server for the frontend. The React (Vite) frontend communicates with the engine exclusively through JSON over HTTP; the API contract is documented in <code>docs/api_spec.md</code>.</p>
+<pre><code>React (Vite build)  ──HTTP/JSON──▶  cpp-httplib REST layer (one mutex)
+                                         │
+                    ┌────────────────────┼─────────────────────┐
+              routing/            evacuation/            dispatch/
+        Dijkstra·A*·BF·FW      Edmonds-Karp + cut    triage·greedy·knapsack
+                    └───────── core/graph.h ◀── data/city_graph.json
+                                    ▲
+                 resilience/ (Tarjan·UF·MST)   ds/ (heaps·hashmap·trie)
+                                    │
+                          db/history (SQLite | JSONL)</code></pre>
+<p>Design decisions worth noting:</p>
+<ul>
+<li><strong>One frozen interface.</strong> All five modules program against a single header, <code>core/graph.h</code>, which was frozen at the start of the project. The graph is stored as an adjacency list; each <code>Edge</code> carries <code>to</code>, <code>length_km</code>, <code>capacity</code>, a <code>blocked</code> flag, and the road’s display name. Freezing the interface allowed the five team members to develop their modules in parallel without merge conflicts on the core.</li>
+<li><strong>Blocked edges as a universal contract.</strong> The disaster module marks edges <code>blocked</code>; every consumer (Dijkstra, A*, Bellman-Ford, Floyd-Warshall, max flow, MST, Tarjan) skips blocked edges at the point where it enumerates neighbours. No algorithm needs to know <em>why</em> a road is closed — the flag is the entire protocol, which is what makes disaster → reroute automatic.</li>
+<li><strong>Concurrency.</strong> A single mutex guards graph mutations and the history log; immutable structures (the trie, full-graph MST inputs) are read without locking. For a demonstration-scale system this is simpler and demonstrably correct, whereas fine-grained locking would add risk without measurable benefit at 40 vertices.</li>
+<li><strong>Persistence.</strong> Operation history survives restarts through a compile-time switch: SQLite when built with <code>USE_SQLITE=1</code>, and a zero-dependency JSONL append-only file otherwise, behind an identical interface. The default build therefore has <em>zero</em> external dependencies.</li>
+</ul>
+<h2 id="the-dataset-indrapur">1.5 The dataset: Indrapur</h2>
+<p>The city graph (40 vertices, 83 edges) is generated by <code>tools/generate_city.py</code>. Rather than hand-drawing a map and hoping it has good algorithmic properties, the generator <em>enforces</em> two properties by construction:</p>
+<ul>
+<li><strong>Admissibility of the A* heuristic.</strong> Every road’s length is at least 1.05 × the haversine (straight-line) distance between its endpoints. The straight-line heuristic therefore never overestimates the true remaining distance, so A* optimality follows by construction rather than by luck (see §2.4 for the argument).</li>
+<li><strong>No accidental fragility.</strong> Every vertex has degree ≥ 3 and the network is 2-edge-connected, so the healthy city has zero bridges and zero articulation points. Critical structure appears only when a disaster closes roads — which is precisely the phenomenon the resilience module is meant to expose. A dataset with pre-existing bridges would blur that demonstration.</li>
+</ul>
+<p>Vertices carry a type (hospital, shelter, fire station, police station, residential, market, school, bridge, park, industrial), latitude/longitude coordinates, and a human-readable name; edges carry length (km) and capacity (persons/hour). Vertex types matter operationally: shelters are max-flow sinks, hospitals/fire stations/police stations host the vehicle fleet, and residential zones are where incidents concentrate.</p>
+<h2 id="data-structures-implemented">1.6 Data structures implemented</h2>
+<p>All structures are hand-written; <code>std::priority_queue</code>, <code>std::unordered_map</code>, and <code>std::sort</code> are deliberately absent from algorithmic code. Section 2 gives each structure’s operations and pseudocode; the table below is the map from structure to role.</p>
+<table style="width:85%;">
+<colgroup>
+<col style="width: 28%" />
+<col style="width: 28%" />
+<col style="width: 28%" />
+</colgroup>
+<thead>
+<tr>
+<th>Structure</th>
+<th>File</th>
+<th>Design notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Binary min-heap</strong></td>
+<td><code>ds/min_heap.h</code></td>
+<td>Array-based; sift-up/sift-down; O(log n) push/pop. Dijkstra, A*, and Prim use <em>lazy deletion</em> in place of decrease-key.</td>
+</tr>
+<tr>
+<td><strong>Binary max-heap</strong></td>
+<td><code>ds/max_heap.h</code></td>
+<td>Priority supplied by a key-extractor; a monotonic sequence number breaks ties FIFO, giving <em>stable</em> triage for equal severities.</td>
+</tr>
+<tr>
+<td><strong>Hash map</strong></td>
+<td><code>ds/hash_map.h</code></td>
+<td>djb2 hash, separate chaining, table doubling at load factor 0.75; O(1) average operations. Used for fleet counting in dispatch.</td>
+</tr>
+<tr>
+<td><strong>Trie</strong></td>
+<td><code>ds/trie.h</code></td>
+<td>O(L) prefix walk plus subtree collection for location autocomplete.</td>
+</tr>
+<tr>
+<td><strong>Union-Find</strong></td>
+<td><code>resilience/union_find.h</code></td>
+<td>Path halving with union by rank; amortised inverse-Ackermann α(n). Used by Kruskal and for component counting.</td>
+</tr>
+<tr>
+<td><strong>Queue (BFS)</strong></td>
+<td>in <code>max_flow.cpp</code>, <code>disaster.cpp</code></td>
+<td>Explicit array with a head index — no <code>std::queue</code>.</td>
+</tr>
+</tbody>
+</table>
+<p>Both heaps assert against <code>pop()</code>/<code>peek()</code> on an empty container, converting a silent undefined-behaviour bug into an immediate diagnostic during development.</p>
+<h2 id="rest-api-summary">1.7 REST API summary</h2>
+<table style="width:85%;">
+<colgroup>
+<col style="width: 42%" />
+<col style="width: 42%" />
+</colgroup>
+<thead>
+<tr>
+<th>Endpoint</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GET /api/health</code>, <code>GET /api/city</code></td>
+<td>status; full graph for the map</td>
+</tr>
+<tr>
+<td><code>GET /api/route?from&amp;to&amp;algo</code></td>
+<td>shortest path (Dijkstra or A*)</td>
+</tr>
+<tr>
+<td><code>POST /api/disaster</code>, <code>POST /api/reset</code></td>
+<td>trigger/clear a disaster</td>
+</tr>
+<tr>
+<td><code>GET /api/evacuation</code></td>
+<td>max flow and min-cut bottleneck roads</td>
+</tr>
+<tr>
+<td><code>POST /api/dispatch</code>, <code>POST /api/supply</code></td>
+<td>vehicle assignment; knapsack loading</td>
+</tr>
+<tr>
+<td><code>GET /api/resilience</code>, <code>GET /api/mst</code></td>
+<td>bridges/APs; restoration backbone</td>
+</tr>
+<tr>
+<td><code>GET /api/suggest?q</code></td>
+<td>trie-based autocomplete</td>
+</tr>
+<tr>
+<td><code>GET /api/compare</code>, <code>GET /api/citystats</code></td>
+<td>algorithm comparison; Floyd-Warshall analytics</td>
+</tr>
+</tbody>
+</table>
+<h2 id="team-organisation-and-report-layout">1.8 Team organisation and report layout</h2>
+<p>The project was developed in five phases by a five-member team, one module per member, against the frozen <code>core/graph.h</code> interface: Phase 1 routing, Phase 2 disaster simulation and evacuation, Phase 3 dispatch and supplies, Phase 4 resilience and search, Phase 5 API/frontend integration and testing.</p>
+<p>The remainder of this report is organised as required: <strong>Section 2 (Algorithm)</strong> presents every data structure and algorithm with pseudocode, a worked example, and a complexity derivation; <strong>Section 3 (Results)</strong> presents the verification methodology and all measured outputs; <strong>Section 4</strong> concludes and lists future scope; <strong>Section 5</strong> lists references.</p>
+<hr />
+<h1 id="algorithm">2. Algorithm</h1>
+<p>This section is the technical core of the report. For each data structure and algorithm we give: (i) the problem it solves inside LifeLine, (ii) pseudocode faithful to the actual C++ implementation, (iii) a small worked example where tracing adds insight, and (iv) a derivation — not merely a statement — of its time and space complexity. Throughout, <strong>V</strong> = 40 is the number of vertices and <strong>E</strong> = 83 the number of edges of the Indrapur graph; complexities are stated for general V, E.</p>
+<h2 id="binary-min-heap-dsmin_heap.h">2.1 Binary min-heap (<code>ds/min_heap.h</code>)</h2>
+<p><strong>Role.</strong> Priority queue for Dijkstra, A*, and Prim; also the sorting engine for Kruskal (heapsort).</p>
+<p><strong>Representation.</strong> A dynamic array where the element at index <em>i</em> has children at 2i+1 and 2i+2 and parent at ⌊(i−1)/2⌋. The <em>heap invariant</em> is <code>a[parent(i)] ≤ a[i]</code> for every non-root <em>i</em>, which guarantees the minimum sits at index 0.</p>
+<pre><code>PUSH(x):
+    append x at index n; i ← n; n ← n+1
+    while i &gt; 0 and a[parent(i)] &gt; a[i]:     # sift-up
+        swap a[i], a[parent(i)]; i ← parent(i)
+
+POP():
+    assert n &gt; 0                              # fail loudly, not silently
+    top ← a[0]; a[0] ← a[n-1]; n ← n-1
+    i ← 0
+    loop:                                     # sift-down
+        s ← smallest of {i, left(i), right(i)} by value (children in range)
+        if s = i: break
+        swap a[i], a[s]; i ← s
+    return top</code></pre>
+<p><strong>Complexity derivation.</strong> The array is a complete binary tree, so its height is ⌊log₂ n⌋. Sift-up moves the new element at most one level per iteration toward the root: ≤ log₂ n swaps. Sift-down symmetrically moves the displaced element at most one level per iteration toward a leaf: ≤ log₂ n comparisons-and-swaps. Hence <strong>push and pop are O(log n)</strong>; <code>peek</code> is O(1); space is O(n) with no per-node pointers (an advantage over pointer-based heaps in both memory and cache behaviour).</p>
+<p><strong>Lazy deletion instead of decrease-key.</strong> Textbook Dijkstra calls <code>decrease-key</code> when a shorter path to an already-queued vertex is found. A binary heap supports decrease-key only if every vertex’s heap index is tracked through every swap — a significant bookkeeping burden and a classic source of bugs. LifeLine instead <em>pushes a duplicate</em> entry with the improved distance and, on pop, <em>skips</em> any entry whose vertex is already settled:</p>
+<pre><code>(d, u) ← POP()
+if settled[u]: continue        # stale duplicate — ignore</code></pre>
+<p>Each edge relaxation pushes at most one entry, so the heap holds O(E) entries instead of O(V); pops cost O(log E) = O(log V²) = O(2 log V) = <strong>O(log V)</strong> — the asymptotics are unchanged, and the code is dramatically simpler. This trade-off (slightly more memory for much simpler, still-optimal code) is standard competitive-programming practice and is documented in the source.</p>
+<h2 id="binary-max-heap-dsmax_heap.h">2.2 Binary max-heap (<code>ds/max_heap.h</code>)</h2>
+<p><strong>Role.</strong> Triage queue for dispatch: the most severe incident must be treated first.</p>
+<p>The max-heap mirrors the min-heap with the comparison reversed, plus two design points:</p>
+<ol type="1">
+<li><strong>Key extractor.</strong> The heap is generic over the stored type; priority is supplied by a function that extracts the key, so the same container can prioritise incidents by severity today and by any other criterion later without modification.</li>
+<li><strong>Stability via sequence numbers.</strong> Binary heaps are <em>not</em> stable: two incidents of equal severity could pop in either order, making triage non-deterministic between runs. LifeLine attaches a monotonically increasing sequence number to every push and breaks priority ties by <em>smaller sequence number first</em>. The comparison key is effectively the pair (severity DESC, sequence ASC), which guarantees FIFO order within a severity class — deterministic, testable, and fair.</li>
+</ol>
+<p>Complexity is identical to the min-heap: <strong>O(log n)</strong> push/pop, O(n) space.</p>
+<h2 id="hash-map-dshash_map.h">2.3 Hash map (<code>ds/hash_map.h</code>)</h2>
+<p><strong>Role.</strong> Counting the vehicle fleet by type in dispatch (<code>"ambulance" → 3</code>, <code>"fire_truck" → 2</code>, …) and general string→value lookup.</p>
+<p><strong>Design.</strong> Separate chaining: an array of B buckets, each a singly linked list of key–value nodes. The hash function is <strong>djb2</strong> over the key string:</p>
+<pre><code>h ← 5381
+for each character c in key: h ← h * 33 + c      # (h &lt;&lt; 5) + h + c
+return h mod B</code></pre>
+<p>Insertion appends to (or updates in) the bucket list; lookup walks one bucket. When the <strong>load factor</strong> n/B exceeds <strong>0.75</strong>, the table doubles: a new array of 2B buckets is allocated and every node is re-hashed into it.</p>
+<p><strong>Complexity derivation.</strong> Under the standard simple-uniform-hashing assumption, each bucket holds n/B = α ≤ 0.75 expected nodes, so search/insert/erase inspect O(1 + α) = <strong>O(1) expected</strong> nodes. Rehashing costs O(n) but occurs only after n/2 insertions since the last doubling, so its <strong>amortised</strong> cost per insertion is O(1) (the standard doubling argument: charge each rehash to the insertions that filled the table). Worst case — all keys colliding — degrades to O(n), which is why the quality of djb2’s bit mixing matters in practice. Space is O(n + B) = O(n).</p>
+<h2 id="trie-dstrie.h">2.4 Trie (<code>ds/trie.h</code>)</h2>
+<p><strong>Role.</strong> Location-name autocomplete for the map’s search box (<code>GET /api/suggest?q=riv</code> → “Riverside Colony”, “River Bridge South”, …).</p>
+<p><strong>Design.</strong> Each node holds a fixed array of child pointers indexed by character, a flag <code>isEnd</code>, and the vertex id for complete names. A query walks the prefix character by character, then performs a DFS of the reached subtree to collect every completed name below it.</p>
+<pre><code>SUGGEST(prefix):
+    node ← root
+    for c in prefix:
+        if node.child[c] = null: return []       # no name has this prefix
+        node ← node.child[c]
+    return COLLECT(node)                          # DFS of subtree, gather isEnd nodes</code></pre>
+<p><strong>Complexity.</strong> The prefix walk is <strong>O(L)</strong> for a prefix of length L — <em>independent of how many names are stored</em>. Collection is O(size of the answer subtree). Space is O(Σ|name|) nodes overall.</p>
+<p><strong>Why a trie and not the hash map of §2.3?</strong> A hash map answers <em>exact</em>-key lookups in O(1), but a <em>prefix</em> query has no single key to hash — answering “all keys starting with <code>riv</code>” from a hash map requires scanning all n keys, O(n·L). The trie’s structure <em>is</em> the prefix index. This is the clearest example in the project of choosing a data structure by matching the query type, not by picking the asymptotically “fastest” structure for some other query.</p>
+<h2 id="union-find-resilienceunion_find.h">2.5 Union-Find (<code>resilience/union_find.h</code>)</h2>
+<p><strong>Role.</strong> Cycle detection in Kruskal’s algorithm (§2.13) and connected-component counting before/after a disaster.</p>
+<p><strong>Design.</strong> Forest of parent pointers with two standard optimisations:</p>
+<pre><code>FIND(x):
+    while parent[x] ≠ x:
+        parent[x] ← parent[parent[x]]     # path halving
+        x ← parent[x]
+    return x
+
+UNION(a, b):                              # union by rank
+    ra ← FIND(a); rb ← FIND(b)
+    if ra = rb: return false              # already connected — adding edge makes a cycle
+    attach lower-rank root under higher-rank root
+    (equal ranks: pick either, increment its rank)
+    return true</code></pre>
+<p><strong>Complexity.</strong> Union by rank alone bounds tree height at O(log n). With path halving added, the amortised cost per operation is <strong>O(α(n))</strong>, where α is the inverse Ackermann function — at most 4 for any n that fits in the physical universe, i.e. effectively constant. (The tight bound is due to Tarjan; the project cites rather than re-proves it.) Space is O(n).</p>
+<p><strong>Worked example.</strong> Kruskal processes edges (A,B), (B,C), (A,C): <code>UNION(A,B)</code> succeeds, <code>UNION(B,C)</code> succeeds, then <code>FIND(A) = FIND(C)</code> — same root — so (A,C) is rejected as a cycle edge. Exactly this mechanism keeps the MST acyclic with 39 edges for 40 vertices.</p>
+<h2 id="breadth-first-search-disaster-spread-simulationdisaster.cpp">2.6 Breadth-first search — disaster spread (<code>simulation/disaster.cpp</code>)</h2>
+<p><strong>Role.</strong> Model a disaster radiating outward from an epicenter, one road-hop per “ring”.</p>
+<p><strong>Algorithm.</strong> Level-order BFS from the epicenter using an explicit array-plus-head-index queue (no <code>std::queue</code>). Ring 0 is the epicenter; ring k is every vertex first reached in k hops. The simulation takes a radius r and: (i) records each affected vertex’s ring number, and (ii) marks every edge whose <em>both</em> endpoints lie inside the affected zone as <code>blocked</code>.</p>
+<pre><code>BFS-RINGS(epicenter, r):
+    ring[*] ← ∞; ring[epicenter] ← 0
+    queue ← [epicenter]; head ← 0
+    while head &lt; |queue|:
+        u ← queue[head]; head ← head+1
+        if ring[u] = r: continue                  # do not expand past the radius
+        for each edge (u,v):
+            if ring[v] = ∞:
+                ring[v] ← ring[u] + 1
+                append v to queue
+    block every edge (u,v) with ring[u] ≤ r and ring[v] ≤ r</code></pre>
+<p><strong>Why BFS and not DFS or Dijkstra?</strong> The physical model is “spreads one hop per time step”, i.e. distance measured in <em>edge count</em>, not kilometres. BFS is precisely the shortest-path algorithm for unweighted distance and visits vertices in non-decreasing ring order by construction (the queue holds at most two consecutive ring values at any time — the standard BFS level invariant). DFS explores depth-first and gives no ring structure; Dijkstra would weight the spread by road length, a different physical model.</p>
+<p><strong>Complexity.</strong> Every vertex enters the queue at most once and every adjacency list is scanned at most once: <strong>O(V + E)</strong> time, O(V) space.</p>
+<p><strong>Downstream contract.</strong> The ring number also becomes the incident <em>severity</em> for dispatch (§2.11): epicenter = 5, ring 1 = 3, ring 2 = 1. One BFS therefore feeds both the map overlay and the triage queue.</p>
+<h2 id="dijkstras-algorithm-routingdijkstra.cpp">2.7 Dijkstra’s algorithm (<code>routing/dijkstra.cpp</code>)</h2>
+<p><strong>Role.</strong> Single-source shortest paths for emergency routing; the workhorse of the project.</p>
+<p><strong>Algorithm.</strong> Maintain <code>dist[v]</code> (best known distance), <code>parent[v]</code> (for path reconstruction), and <code>settled[v]</code> (finalised vertices). Repeatedly pop the unsettled vertex of minimum tentative distance, settle it, and relax its outgoing edges. Blocked edges are skipped, which is the entire mechanism by which disasters reroute traffic.</p>
+<pre><code>DIJKSTRA(g, src, dst):
+    dist[*] ← ∞; parent[*] ← -1; settled[*] ← false
+    dist[src] ← 0; PUSH(pq, (0, src))
+    while pq not empty:
+        (d, u) ← POP(pq)
+        if settled[u]: continue              # lazy deletion (§2.1)
+        settled[u] ← true
+        if u = dst: break                    # early exit: dst is final
+        for each edge e = (u, v, w) with not e.blocked:
+            if d + w &lt; dist[v]:              # relaxation
+                dist[v] ← d + w; parent[v] ← u
+                PUSH(pq, (dist[v], v))
+    if dist[dst] = ∞: return &quot;unreachable&quot;
+    return dist[dst], path by walking parent[] from dst to src, reversed</code></pre>
+<p><strong>Correctness argument (sketch).</strong> Invariant: when a vertex u is settled, <code>dist[u]</code> is the true shortest distance δ(src,u). Proof by contradiction: suppose u is the <em>first</em> settled vertex with <code>dist[u] &gt; δ(src,u)</code>. A true shortest path to u must leave the settled set at some edge (x, y) with x settled, y not. Then <code>dist[y] ≤ dist[x] + w(x,y) ≤ δ(src,u)</code> (x was settled correctly, and the path from y onward has non-negative weight). But the heap popped u before y, so <code>dist[u] ≤ dist[y] ≤ δ(src,u)</code> — contradiction. The argument <em>requires non-negative weights</em> at the marked step; road lengths are positive, so the requirement holds by the problem domain.</p>
+<p><strong>Early-exit justification.</strong> The invariant says a settled vertex’s distance is final; therefore the moment dst is settled, its distance and parent chain cannot improve, and the search may stop. On the demonstration route this saves two-thirds of the work (§3.3).</p>
+<p><strong>Worked trace.</strong> Paper graph used in the unit tests — vertices A…E, edges A–B (4), A–C (1), C–B (2), B–D (5), C–D (8), D–E (3):</p>
+<table style="width:85%;">
+<colgroup>
+<col style="width: 21%" />
+<col style="width: 21%" />
+<col style="width: 21%" />
+<col style="width: 21%" />
+</colgroup>
+<thead>
+<tr>
+<th>Step</th>
+<th>Popped</th>
+<th>Settled set</th>
+<th>dist[] after relaxations</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>(0, A)</td>
+<td>{A}</td>
+<td>B=4, C=1</td>
+</tr>
+<tr>
+<td>2</td>
+<td>(1, C)</td>
+<td>{A,C}</td>
+<td>B=3 (via C), D=9</td>
+</tr>
+<tr>
+<td>3</td>
+<td>(3, B)</td>
+<td>{A,C,B}</td>
+<td>D=8 (via B)</td>
+</tr>
+<tr>
+<td>4</td>
+<td>(4, B)</td>
+<td>—</td>
+<td>stale duplicate, skipped</td>
+</tr>
+<tr>
+<td>5</td>
+<td>(8, D)</td>
+<td>{A,C,B,D}</td>
+<td>E=11</td>
+</tr>
+<tr>
+<td>6</td>
+<td>(9, D)</td>
+<td>—</td>
+<td>stale duplicate, skipped</td>
+</tr>
+<tr>
+<td>7</td>
+<td>(11, E)</td>
+<td>{A,C,B,D,E}</td>
+<td>done</td>
+</tr>
+</tbody>
+</table>
+<p>Shortest A→E path: A→C→B→D→E, distance 11. Step 4 and step 6 show lazy deletion in action: the duplicates pushed before B’s and D’s distances improved are popped and discarded harmlessly.</p>
+<p><strong>Complexity derivation.</strong> Each vertex is settled once. Each edge (u,v) is relaxed at most once per direction (when its endpoint is settled), and each successful relaxation performs one O(log V) push. Pops number at most the pushes, O(E), each O(log V). Total: <strong>O((V + E) log V)</strong> time, O(V + E) space (graph + heap). With V=28, E=48 this is microseconds (§3.5).</p>
+<p><strong>The</strong> <code>dijkstraAll</code> <strong>variant</strong> omits the early exit and returns the full <code>dist[]</code>/<code>parent[]</code> arrays for <em>all</em> vertices from one source. The dispatch module (§2.11) depends on it.</p>
+<h2 id="a-search-routingastar.cpp">2.8 A* search (<code>routing/astar.cpp</code>)</h2>
+<p><strong>Role.</strong> Goal-directed routing: same optimal answer as Dijkstra, less work.</p>
+<p><strong>Algorithm.</strong> Identical loop to Dijkstra, but the heap is ordered by <strong>f(v) = g(v) + h(v)</strong>, where g(v) is the distance from the source so far and h(v) is the <em>haversine straight-line distance from v to the goal</em>. The heuristic steers the search toward the destination instead of expanding uniformly in all directions.</p>
+<p>The haversine formula gives great-circle distance between two latitude/longitude points:</p>
+<pre><code>a = sin²(Δφ/2) + cos φ₁ · cos φ₂ · sin²(Δλ/2)
+d = 2R · asin(√a),      R = 6371 km</code></pre>
+<p><strong>Optimality argument.</strong> A* returns an optimal path if h is <strong>admissible</strong> — h(v) ≤ true remaining distance for every v. The Indrapur generator enforces <code>length(e) ≥ 1.05 × haversine(e.endpoints)</code> for every edge (§1.5); summing along any path, the road distance from v to the goal is at least the sum of straight-line hops, which by the triangle inequality is at least the direct straight line h(v). So admissibility holds <em>by dataset construction</em>. The heuristic is moreover <strong>consistent</strong> (h(u) ≤ w(u,v) + h(v), again by the triangle inequality), which guarantees that — exactly as in Dijkstra — a vertex’s distance is final when settled, so the same lazy-deletion loop remains correct and no vertex is ever re-expanded.</p>
+<p><strong>Effect measured.</strong> On the demonstration route (Riverside Colony → Sunrise Hospital, 4.78 km) Dijkstra settles <strong>24</strong> vertices; A* settles <strong>8</strong> — same distance, same path (§3.3). The intuition: Dijkstra’s frontier is a disc around the source; A*’s is an ellipse stretched toward the goal.</p>
+<p><strong>Complexity.</strong> Worst case identical to Dijkstra, <strong>O((V + E) log V)</strong> — a heuristic cannot help an adversarial graph — but the <em>constant</em> factor in practice is governed by how well h approximates the true distance. h = 0 degenerates A* to exactly Dijkstra.</p>
+<h2 id="bellman-ford-routingbellman_ford.cpp">2.9 Bellman-Ford (<code>routing/bellman_ford.cpp</code>)</h2>
+<p><strong>Role.</strong> Relaxation-based control experiment and the conceptual ancestor of distance-vector routing protocols (RIP). Kept deliberately: comparing it against Dijkstra on every pair (§3.2) is one of the project’s cross-checks.</p>
+<p><strong>Algorithm.</strong> Relax <em>every</em> edge, V−1 times:</p>
+<pre><code>BELLMAN-FORD(g, src):
+    dist[*] ← ∞; dist[src] ← 0
+    repeat V-1 times:
+        for every edge (u, v, w), both directions, not blocked:
+            if dist[u] + w &lt; dist[v]: dist[v] ← dist[u] + w; parent[v] ← u
+    # one extra pass: any further improvement ⇒ negative cycle
+    for every edge (u, v, w):
+        if dist[u] + w &lt; dist[v]: report negative cycle</code></pre>
+<p><strong>Why V−1 passes suffice.</strong> A shortest path in a graph with no negative cycle is simple, hence has at most V−1 edges. Induction on passes: after pass k, every vertex whose shortest path uses ≤ k edges has its final distance (pass k relaxes the k-th edge of every such path in order). After V−1 passes all shortest paths are covered. If a V-th pass still improves anything, some shortest “path” has ≥ V edges, i.e. repeats a vertex, i.e. contains a negative cycle — which is exactly the detection rule.</p>
+<p><strong>Complexity.</strong> (V−1) passes × E edge relaxations = <strong>O(V·E)</strong> time, O(V) space. Slower than Dijkstra, but it tolerates negative weights, which Dijkstra’s correctness proof (§2.7) forbids.</p>
+<h2 id="floyd-warshall-routingfloyd_warshall.cpp">2.10 Floyd-Warshall (<code>routing/floyd_warshall.cpp</code>)</h2>
+<p><strong>Role.</strong> All-pairs shortest paths, powering the city analytics endpoint: network diameter, mean shortest path, and closeness centrality.</p>
+<p><strong>DP formulation.</strong> Number the vertices 1…V. Let <code>d(k)[i][j]</code> = length of the shortest i→j path whose <em>intermediate</em> vertices all come from {1,…,k}. Base case d(0) is the weight matrix. The recurrence considers whether vertex k appears as an intermediate:</p>
+<pre><code>d(k)[i][j] = min( d(k-1)[i][j],                    # k not used
+                  d(k-1)[i][k] + d(k-1)[k][j] )    # k used exactly once</code></pre>
+<p>A shortest path uses k at most once (no negative cycles ⇒ simple), and if it does, both halves have intermediates only in {1,…,k−1} — so the recurrence is exact. The implementation updates one matrix in place; this is safe because row k and column k are unchanged by iteration k (d(k)[i][k] = d(k−1)[i][k] since using k as an intermediate on a path <em>to</em> k is never an improvement without negative cycles).</p>
+<pre><code>for k in 1..V:
+  for i in 1..V:
+    for j in 1..V:
+      d[i][j] ← min(d[i][j], d[i][k] + d[k][j])</code></pre>
+<p><strong>Complexity.</strong> Three nested loops: <strong>O(V³)</strong> time — 40³ = 64,000 relaxations, measured ≈ 112 µs — and <strong>O(V²)</strong> space for the matrix. For all-pairs on a sparse graph one could instead run Dijkstra from every source in O(V·(V+E) log V); at V=40 both are trivial, and Floyd-Warshall was chosen for the analytics module because the full matrix is the <em>product</em>, not an intermediate.</p>
+<p><strong>Analytics defined on the matrix.</strong> Diameter = max over reachable pairs of d[i][j]; mean shortest path = average over pairs; closeness centrality of v = (V−1) / Σ_u d[v][u], ranking how quickly v reaches everywhere (§3.4: the Bus Terminal wins).</p>
+<h2 id="edmonds-karp-maximum-flow-and-minimum-cut-evacuationmax_flow.cpp">2.11 Edmonds-Karp maximum flow and minimum cut (<code>evacuation/max_flow.cpp</code>)</h2>
+<p><strong>Role.</strong> “How many persons/hour can move from the danger zone into shelters, and which roads are the bottleneck?”</p>
+<p><strong>Modelling.</strong> Road capacities (persons/hour) become arc capacities. Because <em>many</em> danger vertices must reach <em>many</em> shelters, the implementation adds a <strong>super-source</strong> S with an infinite-capacity arc to every danger vertex and a <strong>super-sink</strong> T with an infinite-capacity arc from every shelter. This reduces multi-source/multi-sink flow to the standard single-pair problem without changing the answer: any feasible multi-source flow corresponds one-to-one to a feasible S→T flow. Undirected roads become <em>arc pairs</em> with equal capacity in both directions; each arc stores the index of its reverse partner so that pushing flow forward adds residual capacity backward in O(1).</p>
+<p><strong>Algorithm.</strong> Ford-Fulkerson method with the augmenting path chosen by <strong>BFS</strong> (fewest edges) — that single choice is what upgrades Ford-Fulkerson to Edmonds-Karp:</p>
+<pre><code>EDMONDS-KARP(S, T):
+    flow ← 0
+    while BFS finds a path S⇝T using only arcs with residual cap &gt; 0:
+        f ← min residual capacity along the path       # bottleneck
+        for each arc a on the path:
+            a.cap ← a.cap − f                          # use capacity
+            a.rev.cap ← a.rev.cap + f                  # allow undo
+        flow ← flow + f
+    return flow</code></pre>
+<p>The reverse-arc update is the non-obvious heart of the method: it lets a later augmenting path <em>cancel</em> flow sent earlier down a suboptimal route, which is why greedy path-by-path augmentation nevertheless reaches the global optimum.</p>
+<p><strong>Termination and complexity.</strong> Plain Ford-Fulkerson with arbitrary path choice can take Θ(E · f*) iterations (f* = max flow value) — pathological when capacities are large numbers. Edmonds-Karp’s BFS choice yields a capacity-independent bound: each augmentation saturates at least one arc; a classical argument (Edmonds &amp; Karp 1972; CLRS §24) shows the BFS distance from S to any vertex is non-decreasing across augmentations, and an arc can become saturated only O(V) times, giving <strong>O(V·E) augmentations × O(E) per BFS = O(V·E²)</strong> total. Space is O(V + E).</p>
+<p><strong>Minimum cut extraction.</strong> After the loop, one more BFS over the <em>residual</em> graph marks the set A of vertices still reachable from S. The saturated road arcs crossing from A to its complement are exactly the <strong>minimum cut</strong> — the specific roads whose combined capacity limits the evacuation. The <strong>max-flow/min-cut theorem</strong> guarantees Σ(cut capacities) = max flow; LifeLine’s test suite <em>asserts</em> this equality on the real city graph in every run, turning a theorem into an executable check.</p>
+<p><strong>Worked micro-example.</strong> S→a (cap 10), S→b (10), a→b (1), a→T (5), b→T (10). BFS finds S→a→T (push 5), then S→b→T (push 10); a→b is never needed; max flow = 15. Residual BFS reaches {S, a}; the crossing arcs a→T (5) and S→b (10) sum to 15 = flow. ✓</p>
+<h2 id="dispatch-max-heap-triage-greedy-assignment-dispatchdispatch.cpp">2.12 Dispatch: max-heap triage + greedy assignment (<code>dispatch/dispatch.cpp</code>)</h2>
+<p><strong>Role.</strong> Assign a limited fleet (ambulances, fire trucks, police units, stationed at their facilities) to disaster incidents in severity order.</p>
+<p><strong>Step 1 — Triage.</strong> Every affected vertex from the BFS simulation becomes an incident with severity derived from its ring: epicenter = 5, ring 1 = 3, ring 2 = 1. Incidents are pushed into the custom max-heap (§2.2); the sequence number guarantees FIFO order within a severity class, so triage order is fully deterministic.</p>
+<p><strong>Step 2 — Assignment.</strong> For each incident popped in triage order:</p>
+<pre><code>DISPATCH(incident):
+    D ← dijkstraAll(g, incident.location)        # one SSSP from the incident
+    best ← nearest FREE vehicle of a compatible type by D.dist
+    if best exists: assign it; mark busy; record route via D.parent
+    else if no free compatible vehicle: report &quot;no vehicle&quot;
+    else: report &quot;unreachable&quot;                    # cut off by blocked roads</code></pre>
+<p><strong>The direction trick.</strong> The naive formulation runs a shortest-path query per (incident, vehicle) pair. LifeLine instead runs <strong>one</strong> <code>dijkstraAll</code> <em>from the incident</em> and reads off the distance to every candidate vehicle — valid because the graph is undirected, so dist(incident → vehicle) = dist(vehicle → incident). k incidents cost k Dijkstra runs total, <strong>O(k·(V+E) log V)</strong>, independent of fleet size.</p>
+<p><strong>Greedy, and why that is the right call.</strong> Per-incident nearest-free-vehicle is locally optimal, not globally: with vehicles at distances {1, 2} and incidents that both prefer the same vehicle, greedy can force total distance 1 + 9 where the optimum is 2 + 3. The globally optimal offline assignment is minimum-cost bipartite matching (Hungarian algorithm, O(n³)). Dispatch, however, is an <em>online</em> problem — incidents arrive over time and vehicles commit immediately; one cannot hold an ambulance back for a hypothetical future incident. Greedy-by-triage-priority is what real computer-aided-dispatch systems approximate, and the report treats the Hungarian comparison as future work (§4) rather than pretending the greedy is optimal. Incidents whose region has been cut off by blocked roads are reported <strong>unreachable</strong>, connecting the dispatch output directly to the min-cut analysis of §2.11.</p>
+<h2 id="knapsack-dynamic-programming-dispatchsupply.cpp">2.13 0/1 knapsack dynamic programming (<code>dispatch/supply.cpp</code>)</h2>
+<p><strong>Role.</strong> A relief truck has weight capacity W; each supply item i has weight wt(i) and utility value val(i); items are indivisible (a generator cannot be split). Choose the subset of maximum total value with total weight ≤ W.</p>
+<p><strong>Why not greedy?</strong> Sorting by value/weight ratio fails for 0/1 items: with W = 10, items (wt 6, val 60), (wt 5, val 55), (wt 5, val 55) — greedy takes the ratio-10 item first (60), leaving room for nothing better than 60 + nothing = 60… while the optimum is the two ratio-11-forgone items at 110. Indivisibility breaks the exchange argument that makes greedy work for <em>fractional</em> knapsack. The UI demonstrates this gap live on the real supply list.</p>
+<p><strong>Recurrence.</strong> <code>dp[i][w]</code> = best value using the first i items within weight w:</p>
+<pre><code>dp[0][w] = 0
+dp[i][w] = dp[i-1][w]                                  if wt(i) &gt; w
+         = max(dp[i-1][w],                             # skip item i
+               dp[i-1][w - wt(i)] + val(i))            # take item i</code></pre>
+<p><strong>Item recovery.</strong> Backtrack from dp[n][W]: item i was taken iff <code>dp[i][w] ≠ dp[i-1][w]</code>; if taken, subtract wt(i) from w and continue at i−1. This reconstructs the chosen set in O(n).</p>
+<p><strong>Worked table.</strong> Items: A(wt 2, val 3), B(wt 3, val 4), C(wt 4, val 5), W = 6.</p>
+<table style="width:85%;">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 10%" />
+<col style="width: 10%" />
+<col style="width: 10%" />
+<col style="width: 10%" />
+<col style="width: 10%" />
+<col style="width: 10%" />
+<col style="width: 10%" />
+</colgroup>
+<thead>
+<tr>
+<th>dp</th>
+<th>w=0</th>
+<th>1</th>
+<th>2</th>
+<th>3</th>
+<th>4</th>
+<th>5</th>
+<th>6</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>after A</td>
+<td>0</td>
+<td>0</td>
+<td>3</td>
+<td>3</td>
+<td>3</td>
+<td>3</td>
+<td>3</td>
+</tr>
+<tr>
+<td>after B</td>
+<td>0</td>
+<td>0</td>
+<td>3</td>
+<td>4</td>
+<td>4</td>
+<td>7</td>
+<td>7</td>
+</tr>
+<tr>
+<td>after C</td>
+<td>0</td>
+<td>0</td>
+<td>3</td>
+<td>4</td>
+<td>5</td>
+<td>7</td>
+<td><strong>8</strong></td>
+</tr>
+</tbody>
+</table>
+<p>Optimum 8 = A + C (wt 6). Backtrack: dp[3][6]=8 ≠ dp[2][6]=7 ⇒ C taken, w←2; dp[2][2]=3 = dp[1][2] ⇒ B skipped; dp[1][2]=3 ≠ dp[0][2]=0 ⇒ A taken. ✓</p>
+<p><strong>Complexity.</strong> The table has n·(W+1) cells, O(1) work each: <strong>O(n·W) time and space</strong> (space is reducible to O(W) with a single rolled array, at the cost of item recovery). O(n·W) is <em>pseudo-polynomial</em> — polynomial in the numeric value of W, not in its bit length; 0/1 knapsack is NP-complete in general, and the DP is efficient precisely because a relief truck’s integer weight budget is small.</p>
+<h2 id="tarjans-bridges-and-articulation-points-resiliencecritical.cpp">2.14 Tarjan’s bridges and articulation points (<code>resilience/critical.cpp</code>)</h2>
+<p><strong>Role.</strong> Identify the roads (bridges) and junctions (articulation points) whose loss disconnects part of the network — the city’s critical infrastructure.</p>
+<p><strong>Definitions.</strong> A <strong>bridge</strong> is an edge whose removal increases the number of connected components. An <strong>articulation point</strong> is a vertex whose removal (with its incident edges) does so.</p>
+<p><strong>Algorithm.</strong> One DFS computing two arrays: <code>disc[u]</code> — the DFS discovery time — and <code>low[u]</code> — the smallest discovery time reachable from u’s subtree using at most one <em>back edge</em>:</p>
+<pre><code>DFS(u, parentEdge):
+    disc[u] ← low[u] ← time++; children ← 0
+    for each edge (u, v), not blocked:
+        if disc[v] unset:                         # tree edge
+            children++; DFS(v, edge(u,v))
+            low[u] ← min(low[u], low[v])
+            if low[v] &gt;  disc[u]: (u,v) is a BRIDGE
+            if low[v] ≥ disc[u] and u not root: u is an ARTICULATION POINT
+        else if edge ≠ parentEdge:                # back edge
+            low[u] ← min(low[u], disc[v])
+    if u is root and children ≥ 2: u is an ARTICULATION POINT</code></pre>
+<p><strong>Why the conditions are right.</strong> <code>low[v] &gt; disc[u]</code> means <em>no</em> vertex in v’s subtree has any back edge reaching u or above — the tree edge (u,v) is the subtree’s only connection upward, so cutting it disconnects the subtree: a bridge. The articulation condition is the non-strict <code>low[v] ≥ disc[u]</code>: even if the subtree can climb back <em>to u itself</em>, removing u severs it. The root is special because it has no “above”; it separates the graph iff it has ≥ 2 DFS children (each child subtree would fall apart from the others). The strict-vs-non-strict inequality between the two rules is the classic exam trap, and the test suite pins both with hand-drawn graphs.</p>
+<p><strong>Parent-edge (not parent-vertex) tracking.</strong> Skipping the parent <em>vertex</em> breaks on multigraphs: two parallel roads between u and v mean neither is a bridge, but vertex-skipping would ignore the second edge and wrongly report one. LifeLine tracks the parent <em>edge index</em>, handling parallel edges correctly.</p>
+<p><strong>Complexity.</strong> One DFS, each edge examined twice: <strong>O(V + E)</strong> time, O(V) space — remarkably, no more than the cost of merely traversing the graph, versus the naive O(E·(V+E)) “remove each edge and re-check connectivity”.</p>
+<p><strong>Dataset interplay.</strong> On the healthy city both sets are <em>empty by construction</em> (§1.5). After a one-ring flood at River Bridge South, the same algorithm reports 5 critical roads and 7 critical junctions (§3.4) — criticality is revealed as a <em>consequence of the disaster</em>, which is the pedagogical point of the module.</p>
+<h2 id="minimum-spanning-tree-prim-and-kruskal-resiliencemst.cpp">2.15 Minimum spanning tree: Prim and Kruskal (<code>resilience/mst.cpp</code>)</h2>
+<p><strong>Role.</strong> The restoration backbone: the cheapest subset of roads that reconnects every location — the order in which repair crews should reopen roads after a disaster.</p>
+<p><strong>The cut property</strong> (correctness foundation for both): for any partition (S, V∖S) of the vertices, the minimum-weight edge crossing the cut belongs to some MST. Exchange argument: if a spanning tree T lacks crossing-minimum e, then T + e contains a cycle that crosses the cut at some other edge f with w(f) ≥ w(e); T + e − f is a spanning tree no heavier than T.</p>
+<p><strong>Prim’s algorithm</strong> grows one tree from a start vertex, always adding the minimum-weight edge leaving the tree — a direct application of the cut property with S = current tree. The implementation mirrors Dijkstra: the custom min-heap holds candidate edges keyed by weight, with lazy deletion of stale entries. Complexity: every edge is pushed/popped at most once per direction, <strong>O(E log V)</strong> time, O(V + E) space.</p>
+<p><strong>Kruskal’s algorithm</strong> sorts all edges ascending and adds each edge that joins two <em>different</em> components — cut property applied with S = one of the components being merged. Cycle detection is Union-Find (§2.5). The edge ordering is a <strong>heapsort through the project’s own min-heap</strong> (push all E edges, pop E times — O(E log E)), keeping the “no <code>std::sort</code>” rule intact. Complexity: <strong>O(E log E)</strong> for the sort dominating O(E·α(V)) for the unions; note log E ≤ log V² = 2 log V, so this equals O(E log V).</p>
+<pre><code>KRUSKAL(g):
+    push every unblocked edge into MinHeap keyed by length
+    uf ← UnionFind(V); mst ← []
+    while heap not empty and |mst| &lt; V-1:
+        e ← POP()
+        if uf.UNION(e.u, e.v): append e to mst      # false ⇒ cycle, skip
+    return mst</code></pre>
+<p><strong>Mutual certification.</strong> With all edge weights distinct — true of Indrapur — the MST is <em>unique</em> (uniqueness follows from the cut property with strict inequality). Therefore Prim and Kruskal must return not merely equal totals but the <em>same tree</em>; both return <strong>28.068 km</strong>, and the agreement of two structurally different algorithms (vertex-growing vs edge-sorting) is itself a correctness check (§3.2).</p>
+<h2 id="complexity-summary">2.16 Complexity summary</h2>
+<table style="width:85%;">
+<colgroup>
+<col style="width: 21%" />
+<col style="width: 21%" />
+<col style="width: 21%" />
+<col style="width: 21%" />
+</colgroup>
+<thead>
+<tr>
+<th>Algorithm / structure</th>
+<th>Time complexity</th>
+<th>Space</th>
+<th>Role in LifeLine</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>BFS (level-order)</td>
+<td>O(V+E)</td>
+<td>O(V)</td>
+<td>disaster spread rings</td>
+</tr>
+<tr>
+<td>Dijkstra / <code>dijkstraAll</code></td>
+<td>O((V+E) log V)</td>
+<td>O(V+E)</td>
+<td>routing; dispatch distances</td>
+</tr>
+<tr>
+<td>A*</td>
+<td>O((V+E) log V), fewer settles</td>
+<td>O(V+E)</td>
+<td>goal-directed routing</td>
+</tr>
+<tr>
+<td>Bellman-Ford</td>
+<td>O(V·E)</td>
+<td>O(V)</td>
+<td>negative-weight-safe baseline</td>
+</tr>
+<tr>
+<td>Floyd-Warshall</td>
+<td>O(V³)</td>
+<td>O(V²)</td>
+<td>all-pairs analytics</td>
+</tr>
+<tr>
+<td>Edmonds-Karp max flow</td>
+<td>O(V·E²)</td>
+<td>O(V+E)</td>
+<td>evacuation capacity</td>
+</tr>
+<tr>
+<td>Min cut (residual BFS)</td>
+<td>O(V+E)</td>
+<td>O(V)</td>
+<td>bottleneck roads</td>
+</tr>
+<tr>
+<td>Tarjan DFS</td>
+<td>O(V+E)</td>
+<td>O(V)</td>
+<td>bridges + articulation points</td>
+</tr>
+<tr>
+<td>Prim / Kruskal MST</td>
+<td>O(E log V) / O(E log E)</td>
+<td>O(V+E)</td>
+<td>restoration backbone</td>
+</tr>
+<tr>
+<td>0/1 knapsack DP</td>
+<td>O(n·W)</td>
+<td>O(n·W)</td>
+<td>relief-truck loading</td>
+</tr>
+<tr>
+<td>Greedy assignment</td>
+<td>O(k·(V+E) log V), k incidents</td>
+<td>O(V)</td>
+<td>vehicle dispatch</td>
+</tr>
+<tr>
+<td>MinHeap / MaxHeap</td>
+<td>O(log n) push/pop</td>
+<td>O(n)</td>
+<td>priority queues</td>
+</tr>
+<tr>
+<td>HashMap</td>
+<td>O(1) average, O(1) amortised insert</td>
+<td>O(n)</td>
+<td>fleet counting</td>
+</tr>
+<tr>
+<td>Trie</td>
+<td>O(L) per prefix</td>
+<td>O(Σ L)</td>
+<td>autocomplete</td>
+</tr>
+<tr>
+<td>Union-Find</td>
+<td>amortised O(α(n))</td>
+<td>O(n)</td>
+<td>Kruskal, components</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h1 id="results">3. Results</h1>
+<h2 id="verification-methodology">3.1 Verification methodology</h2>
+<p>Correctness is established at three independent levels, each catching a class of error the others cannot.</p>
+<p><strong>Level 1 — Unit and integration tests.</strong> Five suites (<code>tests/test_routing.cpp</code>, <code>test_evacuation.cpp</code>, <code>test_dispatch.cpp</code>, <code>test_resilience.cpp</code>, <code>test_analytics.cpp</code>) contain <strong>96 checks, all passing</strong>. They cover:</p>
+<ul>
+<li><em>Hand-verified paper graphs</em> for every algorithm — small graphs whose answers were computed manually (e.g. the 5-vertex Dijkstra trace of §2.7) so a wrong implementation cannot hide behind a plausible-looking number.</li>
+<li><em>Whole-city properties</em>: all 40 × 40 = 1600 vertex pairs mutually reachable on the healthy graph; flood scenarios reroute rather than fail; <code>POST /api/reset</code> reopens every road (the blocked-edge count returns to zero).</li>
+<li><em>Edge cases</em>: source = destination (distance 0, single-vertex path), unreachable sinks after a cut, empty incident/supply lists, <code>pop()</code> on an empty heap (asserts), duplicate sources given to max flow (sanitised to a set).</li>
+</ul>
+<p><strong>Level 2 — Cross-algorithm agreement.</strong> Independent algorithms are required to agree on quantities they compute in common. This is a powerful test precisely because the implementations share no code paths:</p>
+<ul>
+<li>Dijkstra, A*, Bellman-Ford, and Floyd-Warshall return <strong>identical distances on every one of the 1600 pairs</strong> (four algorithms, three fundamentally different strategies: greedy settle, heuristic-guided greedy settle, iterative relaxation, dynamic programming).</li>
+<li>Prim’s and Kruskal’s MSTs match exactly (unique MST, §2.15).</li>
+<li>The min-cut capacity sum <strong>equals</strong> the max flow — the max-flow/min-cut theorem asserted, not assumed, on the real graph in every test run.</li>
+</ul>
+<p><strong>Level 3 — External verification.</strong> Bridges, articulation points, MST total, network diameter, and closeness centrality were recomputed by <code>tools/verify_city.py</code>, a pure-Python re-implementation of Tarjan’s algorithm, Prim’s algorithm, Dijkstra’s algorithm and Floyd-Warshall that reads the city JSON directly and shares no code with the C++ engine, eliminating the possibility of a shared bug between “implementation” and “test”. All values matched.</p>
+<h2 id="test-outcomes">3.2 Test outcomes</h2>
+<table style="width:85%;">
+<colgroup>
+<col style="width: 28%" />
+<col style="width: 28%" />
+<col style="width: 28%" />
+</colgroup>
+<thead>
+<tr>
+<th>Suite</th>
+<th>Checks</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>test_routing.cpp</code> — 4 algorithms, paper graphs, 1600-pair agreement, blocked-edge rerouting</td>
+<td>31</td>
+<td>pass</td>
+</tr>
+<tr>
+<td><code>test_evacuation.cpp</code> — paper flow networks, super-source reduction, min-cut = max-flow</td>
+<td>18</td>
+<td>pass</td>
+</tr>
+<tr>
+<td><code>test_dispatch.cpp</code> — triage order/stability, nearest-vehicle, unreachable reporting, knapsack vs greedy</td>
+<td>17</td>
+<td>pass</td>
+</tr>
+<tr>
+<td><code>test_resilience.cpp</code> — bridges/APs on paper graphs + healthy/flooded city, Prim = Kruskal, Union-Find</td>
+<td>19</td>
+<td>pass</td>
+</tr>
+<tr>
+<td><code>test_analytics.cpp</code> — Floyd-Warshall matrix, diameter, centrality, trie suggestions</td>
+<td>11</td>
+<td>pass</td>
+</tr>
+<tr>
+<td><strong>Total</strong></td>
+<td><strong>96</strong></td>
+<td><strong>96 / 96, 0 failures</strong></td>
+</tr>
+</tbody>
+</table>
+<h2 id="routing-results">3.3 Routing results</h2>
+<p><strong>Demonstration route</strong> — Riverside Colony → Sunrise Hospital:</p>
+<table style="width:85%;">
+<colgroup>
+<col style="width: 42%" />
+<col style="width: 42%" />
+</colgroup>
+<thead>
+<tr>
+<th>Measurement</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Shortest distance (Dijkstra = A* = Bellman-Ford = Floyd-Warshall)</td>
+<td><strong>4.78 km</strong></td>
+</tr>
+<tr>
+<td>Vertices settled — Dijkstra</td>
+<td>35 of 40</td>
+</tr>
+<tr>
+<td>Vertices settled — A*</td>
+<td><strong>10</strong> of 40</td>
+</tr>
+<tr>
+<td>Path returned by Dijkstra vs A*</td>
+<td>identical</td>
+</tr>
+</tbody>
+</table>
+<p>The 35-vs-10 settle count is the project’s cleanest illustration of what an admissible, consistent heuristic buys: a 3.5× reduction in explored state with zero loss of optimality. Dijkstra’s frontier expands as a disc around the source and had settled nearly the whole city before reaching the hospital; A*’s haversine term stretched the frontier into an ellipse aimed at the goal.</p>
+<p><strong>Dynamic rerouting.</strong> Triggering a one-ring flood at River Bridge South blocks the southern river crossing. The same route query then returns <strong>5.42 km via the northern bridge</strong> — no special “reroute” code exists; Dijkstra simply skips blocked edges (§2.7), and the detour emerges from the algorithm. After <code>POST /api/reset</code>, the original 4.78 km route returns, confirming clean state restoration.</p>
+<p><strong>Bellman-Ford as control.</strong> On all 1600 pairs Bellman-Ford’s O(V·E) relaxation sweep agrees with Dijkstra’s heap-based greedy to full precision, empirically confirming that the lazy-deletion optimisation (§2.1) did not alter results.</p>
+<figure class="shot"><img src="screenshots/ui_main.png" alt="The LifeLine command center: the healthy Indrapur network (40 nodes, 83 roads) with the routing, disaster, and search panels."><figcaption><strong>Figure 1.</strong> The LifeLine command center: the healthy Indrapur network (40 nodes, 83 roads) with the routing, disaster, and search panels.</figcaption></figure><figure class="shot"><img src="screenshots/ui_route.png" alt="Healthy-city routing, Riverside Colony &rarr; Sunrise Hospital: Dijkstra returns the 4.78 km optimal path (35 vertices settled, 16 &micro;s)."><figcaption><strong>Figure 2.</strong> Healthy-city routing, Riverside Colony &rarr; Sunrise Hospital: Dijkstra returns the 4.78 km optimal path (35 vertices settled, 16 &micro;s).</figcaption></figure><figure class="shot"><img src="screenshots/ui_compare.png" alt="Algorithm comparison on the same query: A* settles 10 vertices against Dijkstra's 35 &mdash; identical 4.78 km path, under a third of the search effort."><figcaption><strong>Figure 3.</strong> Algorithm comparison on the same query: A* settles 10 vertices against Dijkstra's 35 &mdash; identical 4.78 km path, under a third of the search effort.</figcaption></figure><h2 id="simulation-evacuation-dispatch-and-resilience-results">3.4 Simulation, evacuation, dispatch, and resilience results</h2>
+<p><strong>Disaster spread.</strong> A radius-2 flood at River Bridge South affects the epicenter (severity 5), its ring-1 neighbours (severity 3), and ring-2 vertices (severity 1); every road interior to the zone is blocked. The map shades the rings; the incident list feeds triage.</p>
+<p><strong>Evacuation capacity.</strong> With the flood zone’s vertices as sources and all shelters as sinks, Edmonds-Karp reports the city’s evacuation throughput in persons/hour, and the residual-graph BFS lists the exact bottleneck roads of the minimum cut. The test suite verifies Σ(bottleneck capacities) = max flow on every run. Operationally, the cut list answers the question a control room actually asks: <em>widening which specific roads would raise evacuation capacity?</em></p>
+<p><strong>Dispatch.</strong> Incidents pop in severity order (5 → 3 → 1), FIFO within each class (§2.2’s sequence numbers make this deterministic). Each incident receives the nearest free compatible vehicle by road distance via one <code>dijkstraAll</code> call from the incident (§2.12). Incidents inside a region severed by the cut are reported <strong>unreachable</strong> — the dispatch view and the min-cut view of the same flood corroborate each other.</p>
+<p><strong>Supply loading.</strong> On the demonstration supply list, the knapsack DP’s chosen load strictly exceeds the greedy value-per-weight load’s total value, demonstrating §2.13’s counterexample on live data rather than only in theory.</p>
+<p><strong>Resilience.</strong></p>
+<table style="width:85%;">
+<colgroup>
+<col style="width: 28%" />
+<col style="width: 28%" />
+<col style="width: 28%" />
+</colgroup>
+<thead>
+<tr>
+<th>Measurement</th>
+<th>Healthy city</th>
+<th>After one-ring flood at River Bridge South</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Bridges (critical roads)</td>
+<td><strong>0</strong> (by dataset construction)</td>
+<td><strong>5</strong></td>
+</tr>
+<tr>
+<td>Articulation points (critical junctions)</td>
+<td><strong>0</strong></td>
+<td><strong>7</strong></td>
+</tr>
+</tbody>
+</table>
+<p>The healthy-city zeros are themselves a test: the generator promises 2-edge-connectivity, and Tarjan’s algorithm confirms it. The post-flood counts show how redundancy evaporates under damage — junctions that had three healthy roads may be down to one.</p>
+<p><strong>Restoration backbone.</strong> Prim and Kruskal both return the identical unique MST, total <strong>34.169 km</strong> — the minimum road-kilometres to keep every location connected, i.e. a principled repair priority list.</p>
+<figure class="shot"><img src="screenshots/ui_disaster.png" alt="One-ring flood at River Bridge South: 8 roads blocked (red zone) and the same route query rerouted live around the closure."><figcaption><strong>Figure 4.</strong> One-ring flood at River Bridge South: 8 roads blocked (red zone) and the same route query rerouted live around the closure.</figcaption></figure><figure class="shot"><img src="screenshots/ui_evacuation.png" alt="Evacuation capacity after the flood: Edmonds&ndash;Karp reports 25,200 people/hour and the nine min-cut bottleneck roads."><figcaption><strong>Figure 5.</strong> Evacuation capacity after the flood: Edmonds&ndash;Karp reports 25,200 people/hour and the nine min-cut bottleneck roads.</figcaption></figure><figure class="shot"><img src="screenshots/ui_dispatch.png" alt="Dispatch assignments in triage order: four units routed to incidents (orange routes); one incident reported unreachable &mdash; cut off by the blocked roads."><figcaption><strong>Figure 6.</strong> Dispatch assignments in triage order: four units routed to incidents (orange routes); one incident reported unreachable &mdash; cut off by the blocked roads.</figcaption></figure><figure class="shot"><img src="screenshots/ui_supply.png" alt="0/1 knapsack truck loading: a 50 kg budget packs 49 kg of supplies for a relief value of 37."><figcaption><strong>Figure 7.</strong> 0/1 knapsack truck loading: a 50 kg budget packs 49 kg of supplies for a relief value of 37.</figcaption></figure><figure class="shot"><img src="screenshots/ui_resilience.png" alt="Post-flood resilience analysis: Tarjan's DFS reveals 2 bridges and 4 articulation points (violet) that the healthy mesh did not have."><figcaption><strong>Figure 8.</strong> Post-flood resilience analysis: Tarjan's DFS reveals 2 bridges and 4 articulation points (violet) that the healthy mesh did not have.</figcaption></figure><figure class="shot"><img src="screenshots/ui_mst.png" alt="Restoration backbone: the unique MST (green), 34.17 km across 39 roads, returned identically by Prim and Kruskal."><figcaption><strong>Figure 9.</strong> Restoration backbone: the unique MST (green), 34.17 km across 39 roads, returned identically by Prim and Kruskal.</figcaption></figure><h2 id="city-analytics-and-performance">3.5 City analytics and performance</h2>
+<table style="width:85%;">
+<colgroup>
+<col style="width: 42%" />
+<col style="width: 42%" />
+</colgroup>
+<thead>
+<tr>
+<th>Measurement</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Network diameter (longest shortest path)</td>
+<td>8.534 km</td>
+</tr>
+<tr>
+<td>Mean shortest path over all pairs</td>
+<td>4.080 km</td>
+</tr>
+<tr>
+<td>Most central location (closeness centrality)</td>
+<td><strong>River Bridge South</strong></td>
+</tr>
+<tr>
+<td>Floyd-Warshall, full city (40³ = 64,000 relaxations)</td>
+<td>≈ 112 µs</td>
+</tr>
+<tr>
+<td>Single Dijkstra query (V=28, E=48)</td>
+<td>single-digit µs</td>
+</tr>
+<tr>
+<td>REST round-trip for a route query (localhost)</td>
+<td>dominated by JSON + HTTP, not by the algorithm</td>
+</tr>
+</tbody>
+</table>
+<p>Two observations. First, the Bus Terminal ranking is intuitive after the fact — it is the hub the generator placed centrally — but the algorithm <em>derives</em> it from distances alone, with no access to vertex types. Second, at this graph size every algorithm is effectively instantaneous; the complexity analysis of §2.16 matters not for Indrapur but for the scaling question (a real metro area has 10⁵–10⁶ vertices, where the gap between O(V³) Floyd-Warshall and per-query Dijkstra becomes decisive) — which is precisely why each complexity in this report is derived rather than quoted.</p>
+<h2 id="build-and-deployment-results">3.6 Build and deployment results</h2>
+<p>The backend builds with a single <code>make</code> using g++ (C++17) and <strong>no external libraries</strong>. On Windows the Makefile detects the platform (via both the <code>OS</code> environment variable and <code>uname</code>, since MSYS2 login shells strip the former) and links <code>-lws2_32 -static</code>, producing a standalone <code>lifeline.exe</code> that runs without the MSYS2 runtime. The React frontend builds with <code>npm run build</code>; the resulting <code>dist/</code> is served by the C++ executable itself, so a live demonstration requires exactly one binary and a browser. A console mode (<code>./lifeline console</code>) exercises the entire engine with no UI dependencies — the mode used by the automated test drivers. The project is version-controlled with Git; the full source is published at <a href="https://github.com/TheGodVishnu21/lifeline">github.com/TheGodVishnu21/lifeline</a>, and a containerised build (Docker, multi-stage: Node for the frontend, g++ for the backend) is deployed on Render at <a href="https://lifeline-31iq.onrender.com">lifeline-31iq.onrender.com</a> — the same single binary serving the API and the built frontend.</p>
+<p><em>Screenshots of the map interface &mdash; healthy-city routing, flood overlay, evacuation bottleneck highlighting, dispatch assignments, and the MST view &mdash; appear as Figures 1&ndash;9 in Sections 3.3 and 3.4.</em></p>
+<hr />
+<h1 id="conclusion">4. Conclusion</h1>
+<p>LifeLine demonstrates that the standard undergraduate DSA syllabus — heaps, hash tables, tries, union-find, BFS/DFS, shortest paths, maximum flow, minimum spanning trees, greedy methods, and dynamic programming — is sufficient to build a genuinely useful decision-support tool. Every structure and algorithm in the project is load-bearing: removing any one of them breaks a visible product feature. The heaps are not an exercise; they are why routing is fast and triage is fair. The trie is not decoration; it is the only structure that answers prefix queries without a full scan. The max-flow/min-cut theorem is not a slide; it is an assertion the test suite executes on real data.</p>
+<p>Three lessons stand out beyond the algorithms themselves. First, <strong>interfaces beat coordination</strong>: freezing <code>core/graph.h</code> and the <code>blocked</code>-edge contract let five modules compose without any module knowing the others’ internals — the flood reroutes ambulances through code that has never heard of floods. Second, <strong>datasets can be designed for pedagogy</strong>: enforcing heuristic admissibility and 2-edge-connectivity in the generator turned “hope the demo works” into “the demo works by construction”. Third, <strong>verification is layered</strong>: hand-checked cases catch logic errors, cross-algorithm agreement catches shared misconceptions, and an external reference implementation catches everything both miss — the same layering used to establish correctness in practice, not merely in coursework.</p>
+<p><strong>Future scope.</strong></p>
+<ul>
+<li>Globally optimal dispatch via minimum-cost bipartite matching (Hungarian algorithm, O(n³)), compared empirically against the greedy policy to quantify the online/offline gap.</li>
+<li>Time-dependent edge weights (traffic profiles) and stochastic disaster models.</li>
+<li>Dinic’s algorithm for max flow (O(V²·E)) benchmarked against Edmonds-Karp at scale.</li>
+<li>Larger, real-map datasets imported from OpenStreetMap, stressing the asymptotic differences that Indrapur’s 40 vertices cannot.</li>
+<li>WebSocket push updates so multiple operator consoles share live state.</li>
+</ul>
+<hr />
+<h1 id="references">5. References</h1>
+<ol type="1">
+<li>T. H. Cormen, C. E. Leiserson, R. L. Rivest, C. Stein, <em>Introduction to Algorithms</em>, 4th ed., MIT Press, 2022.</li>
+<li>J. Kleinberg, É. Tardos, <em>Algorithm Design</em>, Pearson, 2006.</li>
+<li>R. Tarjan, “Depth-first search and linear graph algorithms,” <em>SIAM Journal on Computing</em>, 1(2), 1972.</li>
+<li>J. Edmonds, R. M. Karp, “Theoretical improvements in algorithmic efficiency for network flow problems,” <em>Journal of the ACM</em>, 19(2), 1972.</li>
+<li>P. E. Hart, N. J. Nilsson, B. Raphael, “A formal basis for the heuristic determination of minimum cost paths,” <em>IEEE Transactions on Systems Science and Cybernetics</em>, 4(2), 1968.</li>
+<li>E. W. Dijkstra, “A note on two problems in connexion with graphs,” <em>Numerische Mathematik</em>, 1, 1959.</li>
+<li>R. C. Prim, “Shortest connection networks and some generalizations,” <em>Bell System Technical Journal</em>, 36(6), 1957.</li>
+<li>J. B. Kruskal, “On the shortest spanning subtree of a graph and the traveling salesman problem,” <em>Proceedings of the American Mathematical Society</em>, 7(1), 1956.</li>
+<li>R. Bellman, “On a routing problem,” <em>Quarterly of Applied Mathematics</em>, 16(1), 1958.</li>
+<li>R. W. Floyd, “Algorithm 97: Shortest path,” <em>Communications of the ACM</em>, 5(6), 1962.</li>
+<li>cpp-httplib — header-only C++ HTTP library. https://github.com/yhirose/cpp-httplib</li>
+<li>nlohmann/json — JSON for Modern C++. https://github.com/nlohmann/json</li>
+<li>NetworkX documentation. https://networkx.org</li>
+</ol>
+</body></html>

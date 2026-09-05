@@ -446,6 +446,8 @@
   /* ---------- map ---------- */
   #map { flex: 1; height: 100%; background: #0b0f17; }
   .leaflet-container { background: #0b0f17; font-family: var(--font-ui); }
+  /* Esri Dark Gray Canvas is ~#3a3a3a; darken base tiles to near-black. */
+  .leaflet-tile-pane { filter: brightness(0.42) contrast(1.05); }
   .leaflet-tooltip {
     background: #121826;
     color: var(--ink);
@@ -652,9 +654,11 @@ async function apiGet(path) {
 function initMap() {
   map = L.map("map", { zoomControl: true }).setView([19.075, 72.882], 13);
   // label-free basemap so the real place names under Indrapur stay hidden
-  L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png", {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/">CARTO</a>',
+  // Esri Dark Gray Canvas: key-free. CARTO now watermarks keyless tiles.
+  L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}", {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://www.esri.com/">Esri</a>',
     maxZoom: 19,
+    maxNativeZoom: 16,
   }).addTo(map);
   disasterLayer = L.layerGroup().addTo(map);  // under everything
   mstLayer = L.layerGroup().addTo(map);       // green backbone

@@ -109,8 +109,8 @@ npm run dev          # hot reload: Vite on :5173, /api proxied to :8080
 ### Routing (Dijkstra vs A*)
 
 Route **Riverside Colony → Sunrise Hospital** with algorithm **Compare**:
-both find the same 4.78 km optimal path, but Dijkstra settles **24 nodes**
-vs A*'s **8** — the haversine heuristic focuses the search toward the goal.
+both find the same 4.78 km optimal path, but Dijkstra settles **35 nodes**
+vs A*'s **10** — the haversine heuristic focuses the search toward the goal.
 Hover any road for its name and length.
 
 ### Disaster + evacuation
@@ -145,15 +145,15 @@ Hover any road for its name and length.
 
 ### Resilience + search
 
-1. Type `riv` in the search box — trie prefix search suggests all three
+1. Type `riv` in the search box — trie prefix search suggests all four
    River locations instantly; click one to fly there.
 2. **🕸 Analyze network** on the healthy city: *0 bridges, 0 articulation
    points* — the city was deliberately designed with no single point of
    failure (minimum degree 3, 2-edge-connected mesh).
-3. Trigger the flood and analyze again: **5 critical roads + 7 critical
-   junctions** appear in violet, and River Bridge South is isolated with no
+3. Trigger the flood (2 rings) and analyze again: **6 critical roads +
+   7 critical junctions** appear in violet, and River Bridge South is isolated with no
    hospital reachable. Same Tarjan DFS, different road state.
-4. **🌿 Restoration plan**: the 28.07 km green backbone — with the proof
+4. **🌿 Restoration plan**: the 34.17 km green backbone — with the proof
    line "Prim = Kruskal, two algorithms, one optimum."
 
 ---

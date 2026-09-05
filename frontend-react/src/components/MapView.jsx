@@ -37,11 +37,15 @@ export default function MapView({
       // label-free basemap: Indrapur is fictional, so the real place names
       // underneath (these coords sit over Mumbai's western suburbs) must
       // not show through. Roads/coastline stay for spatial context.
-      'https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png',
+      // Esri's Dark Gray Canvas base is key-free; CARTO's dark_nolabels now
+      // stamps "API KEY REQUIRED" across every tile. CSS darkens it back to
+      // the original near-black (see .leaflet-tile-pane in index.css).
+      'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}',
       {
         attribution:
-          '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/">CARTO</a>',
+          '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://www.esri.com/">Esri</a>',
         maxZoom: 19,
+        maxNativeZoom: 16,   // service stops at 16; Leaflet upscales past it
       }
     ).addTo(map);
     layers.current = {

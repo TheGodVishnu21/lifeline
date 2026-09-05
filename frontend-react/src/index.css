@@ -1113,6 +1113,13 @@ select option {
   font-family: var(--font-ui);
 }
 
+/* Esri's Dark Gray Canvas sits around #3a3a3a — too light for this console.
+   Darken the base tiles only (overlays live in .leaflet-overlay-pane) so the
+   map reads near-black like the original CARTO basemap did. */
+.leaflet-tile-pane {
+  filter: brightness(0.42) contrast(1.05);
+}
+
 /* Dark Tactical Map Tooltip */
 .leaflet-tooltip {
   background: #0f1622;
