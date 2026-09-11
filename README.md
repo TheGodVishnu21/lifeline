@@ -246,7 +246,7 @@ make test
 **96 checks**, all cross-verified against `tools/verify_city.py` (an
 independent pure-Python re-implementation) on the real Indrapur
 graph — shortest paths on all 1600 node pairs, max-flow/min-cut duality,
-bridge/articulation sets, MST totals, graph diameter and centrality.
+bridge/articulation sets, MST totals, graph diameter and centrality
 
 ## Project phases
 
